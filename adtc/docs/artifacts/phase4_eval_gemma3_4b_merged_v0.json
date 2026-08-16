@@ -1,0 +1,49 @@
+{
+  "model": "training/runs/gemma3_4b_merged_v0",
+  "limit": 50,
+  "suites": {
+    "afrimgsm_amh": {
+      "n": 50,
+      "correct": 9,
+      "acc": 0.18
+    },
+    "afrimgsm_eng": {
+      "n": 50,
+      "correct": 16,
+      "acc": 0.32
+    },
+    "afrimmlu_amh": {
+      "n": 50,
+      "correct": 13,
+      "acc": 0.26
+    },
+    "en_stem_holdout": {
+      "n": 50,
+      "correct": 16,
+      "acc": 0.32
+    },
+    "custom_tutoring": {
+      "n": 20,
+      "correct": 14,
+      "acc": 0.7,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "The tank holds 120 * 3/5 = <<120*3/5=72>>72 liters.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "Multiplying both sides of an equation by the same non-zero number keeps the equality true because it is a fundamental property of equality. This property is known as the transitive property of equalit"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "Focus on the operation you need to undo first, and write what that step achieves before computing the final value."
+        }
+      ]
+    }
+  },
+  "forget_proxy": {
+    "en_stem_acc": 0.32,
+    "am_mgsm_acc": 0.18
+  }
+}

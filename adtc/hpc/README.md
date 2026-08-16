@@ -33,6 +33,25 @@ That submits (with `afterok` dependencies):
 6. **`04_train_sft_all.sbatch`** — sequential QLoRA: 1.7B → 4B → Qwen2.5-3B → Gemma3-4B (48h A100)
 7. `05_merge_lora.sbatch` — merge adapter → HF folder
 
+## Phases 2–5 (eval / GGUF / profiler)
+
+Profiler is already in the scratch conda env (`setup_profiler.sbatch`). llama.cpp must be **built on Jubail** (`setup_build_llama_cpp.sbatch`) — official ubuntu binaries need a newer glibc.
+
+```bash
+cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+sbatch setup_build_llama_cpp.sbatch
+sbatch 06_fertility.sbatch
+sbatch 06a_download_unadapted_gguf.sbatch
+# after build + download:
+sbatch --dependency=afterok:<build>:<dl> 06b_profile_unadapted.sbatch
+sbatch 06c_translate_test.sbatch          # nvidia GPU
+sbatch 02b_nllb_mix_v1.sbatch             # nvidia GPU — NLLB-200 → sft_mix_v1
+sbatch 07_eval_adapted.sbatch             # nvidia GPU — four merged HF evals
+sbatch --dependency=afterok:<build> 08_convert_gguf.sbatch
+sbatch --dependency=afterok:<convert> 09_profile_gguf.sbatch
+```
+
+Shared helpers: [`env.sh`](env.sh), [`profiler_env.sh`](profiler_env.sh).
 
 Optional later:
 

@@ -1,0 +1,37 @@
+---
+description: Always update adtc/docs/DEVLOG.md after meaningful work
+alwaysApply: true
+---
+
+# Update DEVLOG after work
+
+After any meaningful progress in this repo, **append a dated entry** to [`adtc/docs/DEVLOG.md`](adtc/docs/DEVLOG.md) in the same session (do not wait to be asked).
+
+## When to update
+
+- HPC / Slurm job outcomes (success, partial, fail) with job ids and log paths when known
+- Data pipeline milestones (download, normalize, mix, model download, train, merge)
+- Bugs found and fixes shipped
+- Gate / phase status changes
+- Decisions that change the plan (skip dataset, change GPU, etc.)
+
+Skip trivial edits (typos, comment-only) unless they affect how someone runs the project.
+
+## Entry shape
+
+Match existing DEVLOG style:
+
+```markdown
+## YYYY-MM-DD — Short title
+
+### Outcome
+One paragraph: what landed / what failed.
+
+### What (optional bullets or tables)
+Concrete paths, job names, counts, OK/FAIL.
+
+### Next
+1–5 concrete follow-ups.
+```
+
+Put new entries at the **bottom** (chronological). Do not rewrite history of older entries; add corrections as a new dated note if needed.

@@ -1,0 +1,49 @@
+{
+  "model": "training/runs/qwen3_4b_merged_v0",
+  "limit": 50,
+  "suites": {
+    "afrimgsm_amh": {
+      "n": 50,
+      "correct": 3,
+      "acc": 0.06
+    },
+    "afrimgsm_eng": {
+      "n": 50,
+      "correct": 15,
+      "acc": 0.3
+    },
+    "afrimmlu_amh": {
+      "n": 50,
+      "correct": 0,
+      "acc": 0.0
+    },
+    "en_stem_holdout": {
+      "n": 50,
+      "correct": 15,
+      "acc": 0.3
+    },
+    "custom_tutoring": {
+      "n": 20,
+      "correct": 20,
+      "acc": 1.0,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "<think>\n\n</think>\n\nThe tank is 3/5 full, so it contains 120 * 3/5 = <<120*3/5=72>>72 liters.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "<think>\n\n</think>\n\nMultiplying both sides of an equation by the same non-zero number keeps the equality true because it maintains the balance of the equation. This is because multiplication is a commu"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "<think>\n\n</think>\n\nThe numbers 2, 7, and 19 are all part of a sequence. What is the next number in the sequence?"
+        }
+      ]
+    }
+  },
+  "forget_proxy": {
+    "en_stem_acc": 0.3,
+    "am_mgsm_acc": 0.06
+  }
+}

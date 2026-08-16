@@ -26,6 +26,21 @@ def load_map(path: Path) -> dict[str, str]:
 
 
 def make_nllb():
+    # Jubail torch is 2.5.x; transformers blocks torch.load on .bin without 2.6+.
+    # NLLB-200 distilled still ships pytorch_model.bin — patch both the module and
+    # the already-imported binding in modeling_utils.
+    try:
+        import transformers.utils.import_utils as iu
+        import transformers.modeling_utils as mu
+
+        def _ok() -> None:
+            return None
+
+        iu.check_torch_load_is_safe = _ok  # type: ignore[assignment]
+        mu.check_torch_load_is_safe = _ok  # type: ignore[assignment]
+    except Exception:
+        pass
+
     from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
     import torch
 

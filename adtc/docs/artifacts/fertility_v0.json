@@ -1,0 +1,128 @@
+{
+  "models": [
+    {
+      "tokenizer": "Qwen/Qwen3-1.7B",
+      "n_pairs": 10,
+      "mean_F_am": 5.777647907647908,
+      "mean_R_am_en": 4.311529581529581,
+      "pairs": [
+        {
+          "id": "fert_001",
+          "tokens_en": 9,
+          "tokens_am": 26,
+          "F_am": 5.2,
+          "R_am_en": 2.888888888888889
+        },
+        {
+          "id": "fert_002",
+          "tokens_en": 14,
+          "tokens_am": 52,
+          "F_am": 4.7272727272727275,
+          "R_am_en": 3.7142857142857144
+        },
+        {
+          "id": "fert_003",
+          "tokens_en": 11,
+          "tokens_am": 39,
+          "F_am": 5.571428571428571,
+          "R_am_en": 3.5454545454545454
+        }
+      ],
+      "note": "High F_am or R_am/en suggests fragmentation; consider vocab work only if severe.",
+      "fragmentation_flag": "severe"
+    },
+    {
+      "tokenizer": "Qwen/Qwen3-4B",
+      "n_pairs": 10,
+      "mean_F_am": 5.777647907647908,
+      "mean_R_am_en": 4.311529581529581,
+      "pairs": [
+        {
+          "id": "fert_001",
+          "tokens_en": 9,
+          "tokens_am": 26,
+          "F_am": 5.2,
+          "R_am_en": 2.888888888888889
+        },
+        {
+          "id": "fert_002",
+          "tokens_en": 14,
+          "tokens_am": 52,
+          "F_am": 4.7272727272727275,
+          "R_am_en": 3.7142857142857144
+        },
+        {
+          "id": "fert_003",
+          "tokens_en": 11,
+          "tokens_am": 39,
+          "F_am": 5.571428571428571,
+          "R_am_en": 3.5454545454545454
+        }
+      ],
+      "note": "High F_am or R_am/en suggests fragmentation; consider vocab work only if severe.",
+      "fragmentation_flag": "severe"
+    },
+    {
+      "tokenizer": "Qwen/Qwen2.5-3B-Instruct",
+      "n_pairs": 10,
+      "mean_F_am": 5.777647907647908,
+      "mean_R_am_en": 4.311529581529581,
+      "pairs": [
+        {
+          "id": "fert_001",
+          "tokens_en": 9,
+          "tokens_am": 26,
+          "F_am": 5.2,
+          "R_am_en": 2.888888888888889
+        },
+        {
+          "id": "fert_002",
+          "tokens_en": 14,
+          "tokens_am": 52,
+          "F_am": 4.7272727272727275,
+          "R_am_en": 3.7142857142857144
+        },
+        {
+          "id": "fert_003",
+          "tokens_en": 11,
+          "tokens_am": 39,
+          "F_am": 5.571428571428571,
+          "R_am_en": 3.5454545454545454
+        }
+      ],
+      "note": "High F_am or R_am/en suggests fragmentation; consider vocab work only if severe.",
+      "fragmentation_flag": "severe"
+    },
+    {
+      "tokenizer": "google/gemma-3-4b-it",
+      "n_pairs": 10,
+      "mean_F_am": 2.7897799422799423,
+      "mean_R_am_en": 2.0813791763791767,
+      "pairs": [
+        {
+          "id": "fert_001",
+          "tokens_en": 9,
+          "tokens_am": 13,
+          "F_am": 2.6,
+          "R_am_en": 1.4444444444444444
+        },
+        {
+          "id": "fert_002",
+          "tokens_en": 13,
+          "tokens_am": 27,
+          "F_am": 2.4545454545454546,
+          "R_am_en": 2.076923076923077
+        },
+        {
+          "id": "fert_003",
+          "tokens_en": 11,
+          "tokens_am": 21,
+          "F_am": 3.0,
+          "R_am_en": 1.9090909090909092
+        }
+      ],
+      "note": "High F_am or R_am/en suggests fragmentation; consider vocab work only if severe.",
+      "fragmentation_flag": "ok"
+    }
+  ]
+}

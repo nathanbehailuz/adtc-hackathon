@@ -1,0 +1,4 @@
+/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/fertility_parts/fertility_Qwen_Qwen3-1_7B.json
+/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/fertility_parts/fertility_Qwen_Qwen3-4B.json
+/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/fertility_parts/fertility_Qwen_Qwen2_5-3B-Instruct.json
+/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/fertility_parts/fertility_google_gemma-3-4b-it.json

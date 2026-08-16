@@ -1,0 +1,24 @@
+{
+  "files": [
+    "gemma3_4b_merged_v0-Q4_K_M.gguf",
+    "gemma3_4b_merged_v0-Q5_K_M.gguf",
+    "gemma3_4b_merged_v0-Q6_K.gguf",
+    "gemma3_4b_merged_v0-Q8_0.gguf",
+    "gemma3_4b_merged_v0-f16.gguf",
+    "qwen25_3b_instruct_merged_v0-Q4_K_M.gguf",
+    "qwen25_3b_instruct_merged_v0-Q5_K_M.gguf",
+    "qwen25_3b_instruct_merged_v0-Q6_K.gguf",
+    "qwen25_3b_instruct_merged_v0-Q8_0.gguf",
+    "qwen25_3b_instruct_merged_v0-f16.gguf",
+    "qwen3_1_7b_merged_v0-Q4_K_M.gguf",
+    "qwen3_1_7b_merged_v0-Q5_K_M.gguf",
+    "qwen3_1_7b_merged_v0-Q6_K.gguf",
+    "qwen3_1_7b_merged_v0-Q8_0.gguf",
+    "qwen3_1_7b_merged_v0-f16.gguf",
+    "qwen3_4b_merged_v0-Q4_K_M.gguf",
+    "qwen3_4b_merged_v0-Q5_K_M.gguf",
+    "qwen3_4b_merged_v0-Q6_K.gguf",
+    "qwen3_4b_merged_v0-Q8_0.gguf",
+    "qwen3_4b_merged_v0-f16.gguf"
+  ]
+}

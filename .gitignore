@@ -22,3 +22,4 @@ __pycache__/
 adtc/training/.conda-env/
 adtc/hpc/logs/*
 !adtc/hpc/logs/.gitkeep
+adtc/.env

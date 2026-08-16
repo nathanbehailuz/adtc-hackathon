@@ -1,0 +1,40 @@
+{
+  "team_id": "adtc_hpc_screen",
+  "domain": "math_scientific_reasoning",
+  "language_scope": [
+    "en",
+    "am"
+  ],
+  "african_alpha_claim": true,
+  "budget_laptop_claim": true,
+  "submitter": {
+    "name": "ADTC HPC",
+    "email": "hpc@example.com",
+    "github_handle": "adtc-hpc"
+  },
+  "cross_disciplinary_pairing": {
+    "discipline": "education",
+    "load_bearing": true,
+    "description": "Offline bilingual Amharic/English STEM tutor screen run."
+  },
+  "test_prompts": [
+    {
+      "prompt_id": "tp_001",
+      "prompt": "A student writes 3/4 + 1/2 = 4/6. Identify the first mistake, then give one hint."
+    },
+    {
+      "prompt_id": "tp_002",
+      "prompt": "\u12a0\u1295\u12f5 \u1270\u121b\u122a 2x + 5 = 13 \u1265\u120e \u133d\u134e x = 9 \u12a0\u1208\u1362 \u12e8\u1218\u1300\u1218\u122a\u12eb\u12cd\u1295 \u1235\u1205\u1270\u1275 \u1320\u1241\u121d\u1362"
+    }
+  ],
+  "model": {
+    "name": "qwen3_4b_q4_k_m",
+    "runtime": "llama.cpp",
+    "quantization": "Q4_K_M",
+    "parameters_estimate": "4B",
+    "packaging": "binary_bundle"
+  },
+  "_runtime": {
+    "model_path": "model/model.gguf"
+  }
+}

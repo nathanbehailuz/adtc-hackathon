@@ -332,3 +332,66 @@ Models loaded and data mapped fine before the crash (A100, mix 2000 rows).
 cd /scratch/nz2212/adtc-hackathon/adtc/hpc
 sbatch 04_train_sft_all.sbatch
 ```
+
+---
+
+## 2026-08-16 — SFT all models OK; merge script covers all four
+
+### Outcome
+Job `adtc_sft_all-17260420`: **failed=0 / total=4**. Adapters under `training/runs/*/adapter`:
+
+| Run | Base |
+|-----|------|
+| `qwen3_1_7b_qlora_v0` | Qwen/Qwen3-1.7B |
+| `qwen3_4b_qlora_v0` | Qwen/Qwen3-4B |
+| `qwen25_3b_instruct_qlora_v0` | Qwen/Qwen2.5-3B-Instruct |
+| `gemma3_4b_qlora_v0` | google/gemma-3-4b-it |
+
+`05_merge_lora.sbatch` previously merged **only** 1.7B; updated to merge all four sequentially on `compute`.
+
+### Next
+```bash
+cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+sbatch 05_merge_lora.sbatch
+```
+
+---
+
+## 2026-08-16 — Merge all four OK; plan status check
+
+### Outcome
+Job `adtc_merge_all-17260554`: **failed=0 / total=4**. Merged HF folders:
+
+- `runs/qwen3_1_7b_merged_v0`
+- `runs/qwen3_4b_merged_v0`
+- `runs/qwen25_3b_instruct_merged_v0`
+- `runs/gemma3_4b_merged_v0`
+
+### PRD progress (not all done)
+| Phase | Status |
+|-------|--------|
+| 0 Packaging | Done |
+| 1 Eval freeze | Done |
+| 2 Baseline GGUF screen + fertility + Gate 2 finalists | **Open** (HF bases yes; profiler/GGUF screen no) |
+| 3 Bilingual data | **Partial** (mix exists; stub MT; no fluent review / real NLLB) |
+| 4 Adapt | **Partial** (QLoRA+merge done; post-adapt eval / CPT decision open) |
+| 5 GGUF PTQ + Pareto | **Not started** |
+| 6 Ablations | Optional |
+| 7 Package / REPORT / demo | **Not started** |
+
+### Next (critical path to Gate 1)
+1. Convert merged HF → GGUF → Q8/Q4; profile (Phase 5)
+2. Or finish Phase 2 unadapted GGUF screen first if still needed for finalist pick
+3. Replace stub Amharic MT before claiming strong am STEM; Nathan review samples
+4. Package winner into submission template
+
+---
+
+## 2026-08-16 — ADTC profiler in scratch conda (HPC)
+
+### Outcome
+Job `adtc_setup_profiler-17260598` **COMPLETED** (exit 0). Pinned `adtc-profiler` (`ac2e137…`) + `llama-cpp-python` 0.3.34 installed into `adtc/training/.conda-env`. Login-node pip failed earlier (no `g++` / `ninja posix_spawn`); compute job with `gcc/12.2.0` + `cmake/3.31.2` worked. Docs: `hpc/setup_profiler.sbatch`, `TOOLING.md` HPC section.
+
+### Next
+1. Install linux llama.cpp **b10451** binaries under `adtc/tools/` and put `llama-bench` on PATH for jobs
+2. Run fertility + unadapted GGUF profiler screen on Slurm

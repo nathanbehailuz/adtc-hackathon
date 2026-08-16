@@ -1,0 +1,82 @@
+[
+  {
+    "key": "qwen3_1_7b_q4_k_m",
+    "profile_ok": true,
+    "compat_only": false,
+    "tps": 2.28,
+    "peak_rss_mb": 1897.39,
+    "steady_rss_mb": 1806.1,
+    "throttled": false,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/phase2_profile_qwen3_1_7b_q4_k_m.json"
+  },
+  {
+    "key": "qwen3_1_7b_q6_k",
+    "profile_ok": true,
+    "compat_only": false,
+    "tps": 2.01,
+    "peak_rss_mb": 1553.19,
+    "steady_rss_mb": 1453.06,
+    "throttled": false,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/phase2_profile_qwen3_1_7b_q6_k.json"
+  },
+  {
+    "key": "qwen3_4b_q4_k_m",
+    "profile_ok": true,
+    "compat_only": false,
+    "tps": 1.55,
+    "peak_rss_mb": 4293.86,
+    "steady_rss_mb": 2479.65,
+    "throttled": false,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/phase2_profile_qwen3_4b_q4_k_m.json"
+  },
+  {
+    "key": "qwen3_4b_q6_k",
+    "profile_ok": true,
+    "compat_only": false,
+    "tps": 1.26,
+    "peak_rss_mb": 3398.53,
+    "steady_rss_mb": 3260.53,
+    "throttled": false,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/phase2_profile_qwen3_4b_q6_k.json"
+  },
+  {
+    "key": "qwen25_3b_q4_k_m",
+    "profile_ok": true,
+    "compat_only": false,
+    "tps": 1.41,
+    "peak_rss_mb": 3465.79,
+    "steady_rss_mb": 3340.06,
+    "throttled": false,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/phase2_profile_qwen25_3b_q4_k_m.json"
+  },
+  {
+    "key": "gemma3_4b_q4_k_m",
+    "profile_ok": true,
+    "compat_only": false,
+    "tps": 1.28,
+    "peak_rss_mb": 4090.15,
+    "steady_rss_mb": 3932.94,
+    "throttled": false,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/phase2_profile_gemma3_4b_q4_k_m.json"
+  },
+  {
+    "key": "gemma3_4b_q6_k",
+    "profile_ok": true,
+    "compat_only": false,
+    "tps": 1.35,
+    "peak_rss_mb": 3301.81,
+    "steady_rss_mb": 3151.73,
+    "throttled": false,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/phase2_profile_gemma3_4b_q6_k.json"
+  },
+  {
+    "key": "qwen35_2b_q4_k_m",
+    "profile_ok": true,
+    "compat_only": true,
+    "tps": 1.71,
+    "peak_rss_mb": 1934.95,
+    "steady_rss_mb": 1843.26,
+    "throttled": false,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/phase2_profile_qwen35_2b_q4_k_m.json"
+  }
+]
