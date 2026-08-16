@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from lib.run_log import RunLogger  # noqa: E402
 
-# Phase 2 / 4 shortlist — edit here when the screen list changes.
+# Phase 2 / 4 shortlist — aligned with docs/PRD.md Phase 2 baseline screen.
 DEFAULT_MODELS = [
     {
         "key": "qwen3_1_7b",
@@ -34,6 +34,26 @@ DEFAULT_MODELS = [
         "key": "qwen3_4b",
         "hf_id": "Qwen/Qwen3-4B",
         "role": "accuracy_candidate",
+    },
+    {
+        "key": "gemma3_4b",
+        "hf_id": "google/gemma-3-4b-it",
+        "role": "architecture_control",
+    },
+    {
+        "key": "qwen25_3b_instruct",
+        "hf_id": "Qwen/Qwen2.5-3B-Instruct",
+        "role": "middle_size_control",
+    },
+    {
+        "key": "qwen35_2b",
+        "hf_id": "Qwen/Qwen3.5-2B",
+        "role": "compat_check_optional",
+    },
+    {
+        "key": "qwen35_4b",
+        "hf_id": "Qwen/Qwen3.5-4B",
+        "role": "compat_check_optional",
     },
 ]
 

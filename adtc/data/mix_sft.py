@@ -27,9 +27,20 @@ DEDUP = ROOT / "eval" / "dedup_against_eval.py"
 
 
 def read_jsonl(path: Path) -> list[dict]:
+    """Read JSONL by physical newlines only (not str.splitlines).
+
+    Amharic / multilingual text can contain U+2028/U+2029; ``splitlines()``
+    would split mid-JSON-string and raise JSONDecodeError.
+    """
     if not path.exists():
         return []
-    return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows: list[dict] = []
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    return rows
 
 
 def sample_pool(rows: list[dict], k: int, rng: random.Random) -> list[dict]:

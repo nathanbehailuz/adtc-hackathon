@@ -3,14 +3,16 @@
 #SBATCH -p compute
 #SBATCH -c 8
 #SBATCH --mem=32G
-#SBATCH -t 8:00:00
+#SBATCH -t 12:00:00
 #SBATCH -o logs/%x-%j.out
 #SBATCH -e logs/%x-%j.err
 
-# Download Qwen3 HF bases for training (1.7B + 4B).
-# Submit from adtc/hpc/ after setup_env.sbatch has finished:
+# Download Phase 2 HF bases (PRD Must + optional controls).
+#   Qwen3-1.7B, Qwen3-4B, Gemma 3 4B-IT, Qwen2.5-3B-Instruct, Qwen3.5-2B/4B
+# Submit from adtc/hpc/ after setup_env.sbatch:
 #   sbatch 03_download_models.sbatch
-# Or chain: sbatch --dependency=afterok:<setup_jobid> 03_download_models.sbatch
+# Gemma is gated — set HF_TOKEN (or huggingface-cli login) before submit if needed.
+# Already-cached models (e.g. Qwen3) are skipped/fast via Hub cache.
 set -euo pipefail
 HPC_DIR="${SLURM_SUBMIT_DIR:?SLURM_SUBMIT_DIR unset; sbatch from adtc/hpc/}"
 # shellcheck disable=SC1091
@@ -22,4 +24,4 @@ conda activate /scratch/nz2212/adtc-hackathon/adtc/training/.conda-env
 set -u
 
 cd "${ADTC_ROOT}"
-python training/download_base_models.py --only qwen3_1_7b qwen3_4b
+python training/download_base_models.py

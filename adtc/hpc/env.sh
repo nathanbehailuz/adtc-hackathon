@@ -24,6 +24,19 @@ export HF_DATASETS_CACHE="${ADTC_ROOT}/data/raw/hf"
 export HUGGINGFACE_HUB_CACHE="${HF_HOME}"
 mkdir -p "${HF_HOME}" "${HF_DATASETS_CACHE}"
 
+# Secrets from adtc/.env (gitignored) — e.g. HF_TOKEN for gated Gemma / datasets
+ENV_FILE="${ADTC_ROOT}/.env"
+if [[ -f "${ENV_FILE}" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "${ENV_FILE}"
+  set +a
+fi
+# huggingface_hub also checks HUGGING_FACE_HUB_TOKEN
+if [[ -n "${HF_TOKEN:-}" && -z "${HUGGING_FACE_HUB_TOKEN:-}" ]]; then
+  export HUGGING_FACE_HUB_TOKEN="${HF_TOKEN}"
+fi
+
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
 export TOKENIZERS_PARALLELISM=false
 
@@ -53,4 +66,9 @@ echo "[env] HPC_DIR=${HPC_DIR}"
 echo "[env] ADTC_ROOT=${ADTC_ROOT}"
 echo "[env] CONDA_PREFIX=${CONDA_PREFIX:-}"
 echo "[env] HF_HOME=${HF_HOME}"
+if [[ -n "${HF_TOKEN:-}" || -n "${HUGGING_FACE_HUB_TOKEN:-}" ]]; then
+  echo "[env] HF_TOKEN=set"
+else
+  echo "[env] HF_TOKEN=unset (gated Hub models/datasets may fail)"
+fi
 echo "[env] python=$(command -v python) ($(python -V 2>&1))"

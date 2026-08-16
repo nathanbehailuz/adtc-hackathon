@@ -9,15 +9,20 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
 from pathlib import Path
 
+os.environ.setdefault("HF_DATASETS_NUM_PROC", "1")
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from lib.run_log import RunLogger  # noqa: E402
 RAW = ROOT / "data" / "raw" / "hf"
+SNAPSHOTS = ROOT / "data" / "raw" / "snapshots"
 OUT_DIR = ROOT / "data" / "train" / "sources"
 DEDUP = ROOT / "eval" / "dedup_against_eval.py"
 EVAL_FILES = [
@@ -26,6 +31,16 @@ EVAL_FILES = [
     ROOT / "data" / "eval" / "afrimgsm_amh_test_v0.jsonl",
     ROOT / "data" / "eval" / "afrimgsm_eng_test_v0.jsonl",
 ]
+
+# Map normalize --sources name → download snapshot key
+SNAPSHOT_KEY = {
+    "walia": "walia",
+    "finetome": "finetome_am",
+    "afriquellm_gsm8k": "afriquellm_gsm8k",
+    "r1": "r1_multilingual",
+    "dolly": "dolly_am",
+    "taco": "taco_am",
+}
 
 
 def emit(row_id: str, direction: str, behavior: str, user: str, assistant: str, source: str) -> dict:
@@ -53,6 +68,22 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 
+def load_snapshot_rows(source_name: str, limit: int | None) -> list[dict] | None:
+    key = SNAPSHOT_KEY.get(source_name, source_name)
+    path = SNAPSHOTS / f"{key}.jsonl"
+    if not path.exists():
+        return None
+    rows: list[dict] = []
+    with path.open(encoding="utf-8") as f:
+        for i, line in enumerate(f):
+            if limit is not None and i >= limit:
+                break
+            line = line.strip()
+            if line:
+                rows.append(json.loads(line))
+    return rows
+
+
 def load_hf(hf_id: str, split: str = "train", limit: int | None = None, config: str | None = None):
     from datasets import load_dataset
 
@@ -63,6 +94,14 @@ def load_hf(hf_id: str, split: str = "train", limit: int | None = None, config: 
     if limit is not None:
         ds = ds.select(range(min(limit, len(ds))))
     return ds
+
+
+def iter_examples(source_name: str, hf_id: str, limit: int | None = None, config: str | None = None):
+    """Prefer local download snapshots; fall back to HF Hub/cache."""
+    snap = load_snapshot_rows(source_name, limit)
+    if snap is not None:
+        return snap
+    return load_hf(hf_id, limit=limit, config=config)
 
 
 def from_instruction_fields(ex: dict) -> tuple[str, str] | None:
@@ -82,7 +121,7 @@ def from_instruction_fields(ex: dict) -> tuple[str, str] | None:
 
 
 def normalize_walia(limit: int | None) -> Path:
-    ds = load_hf("EthioNLP/Amharic_Instruction_dataset", limit=limit)
+    ds = iter_examples("walia", "EthioNLP/Amharic_Instruction_dataset", limit=limit)
     rows = []
     for i, ex in enumerate(ds):
         pair = from_instruction_fields(dict(ex))
@@ -97,7 +136,7 @@ def normalize_walia(limit: int | None) -> Path:
 
 
 def normalize_finetome(limit: int | None) -> Path:
-    ds = load_hf("addisai/FineTome-single-turn-dedup-amharic", limit=limit)
+    ds = iter_examples("finetome", "addisai/FineTome-single-turn-dedup-amharic", limit=limit)
     rows = []
     for i, ex in enumerate(ds):
         pair = from_instruction_fields(dict(ex))
@@ -120,7 +159,7 @@ def normalize_finetome(limit: int | None) -> Path:
 
 
 def normalize_afriquellm_gsm8k(limit: int | None) -> Path:
-    ds = load_hf("peterlu02/afriquellm-coldstart-gsm8k-11lang", limit=limit)
+    ds = iter_examples("afriquellm_gsm8k", "peterlu02/afriquellm-coldstart-gsm8k-11lang", limit=limit)
     rows = []
     for i, ex in enumerate(ds):
         ex = dict(ex)
@@ -148,7 +187,7 @@ def normalize_afriquellm_gsm8k(limit: int | None) -> Path:
 
 
 def normalize_r1(limit: int | None) -> Path:
-    ds = load_hf("lightblue/reasoning-multilingual-R1-Llama-70B-train", limit=limit)
+    ds = iter_examples("r1", "lightblue/reasoning-multilingual-R1-Llama-70B-train", limit=limit)
     rows = []
     for i, ex in enumerate(ds):
         ex = dict(ex)
@@ -169,7 +208,7 @@ def normalize_r1(limit: int | None) -> Path:
 
 
 def normalize_dolly(limit: int | None) -> Path:
-    ds = load_hf("iocuydi/amharic-dolly-15k", limit=limit)
+    ds = iter_examples("dolly", "iocuydi/amharic-dolly-15k", limit=limit)
     rows = []
     for i, ex in enumerate(ds):
         pair = from_instruction_fields(dict(ex))
@@ -184,7 +223,7 @@ def normalize_dolly(limit: int | None) -> Path:
 
 
 def normalize_taco(limit: int | None) -> Path:
-    ds = load_hf("CRLannister/Amharic", limit=limit)
+    ds = iter_examples("taco", "CRLannister/Amharic", limit=limit)
     rows = []
     for i, ex in enumerate(ds):
         pair = from_instruction_fields(dict(ex))
@@ -252,6 +291,11 @@ def main() -> None:
                 continue
             log.item_start(name, limit=args.limit)
             try:
+                key = SNAPSHOT_KEY.get(name, name)
+                snap = SNAPSHOTS / f"{key}.jsonl"
+                if not snap.exists() and name == "afriquellm_gsm8k":
+                    log.item_skip(name, "no snapshot; download failed or missing on Hub")
+                    continue
                 path = fn(args.limit)
                 deduped = False
                 if not args.skip_dedup and path.exists() and path.stat().st_size > 0:

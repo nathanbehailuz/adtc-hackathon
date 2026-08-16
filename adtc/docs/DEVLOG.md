@@ -145,3 +145,135 @@ Train-source download was stopped mid-run (FineWeb2 OK; gated news FAIL; Wikiped
 | later sources | not finished (interrupted) |
 
 Tomorrow on HPC: re-run download (or `--only` remaining keys), then normalize → mix → `training/download_base_models.py` → SFT.
+
+---
+
+## 2026-08-16 — Jubail HPC: Slurm pipeline + Phase 3 data (in progress)
+
+### Outcome
+Repo runs from `$SCRATCH` (`/scratch/nz2212/adtc-hackathon`). Slurm jobs under [`adtc/hpc/`](../hpc/); root [`README.md`](../../README.md). Env setup **succeeded**. Train download **partial OK**. Prep job advanced through SFT normalize + EN STEM; **mix still failing** until JSONL reader fix (see below). Model download job ready (`03_download_models.sbatch` → Qwen3-1.7B + 4B).
+
+### Slurm / env
+- Added: `setup_env.sbatch`, `01`–`05` (+ `04b`), `env.sh`, `submit_chain.sh`, [`hpc/README.md`](../hpc/README.md)
+- Conda: `/scratch/nz2212/adtc-hackathon/adtc/training/.conda-env` (CUDA torch + `training/requirements.txt`)
+- Fixes that mattered on Jubail:
+  - Use **`SLURM_SUBMIT_DIR`** (not `BASH_SOURCE` — spool copy is not writable)
+  - **`set +u` around conda activate** (`MKL_INTERFACE_LAYER` unbound under `set -u`)
+  - Explicit `conda activate …/training/.conda-env` in job scripts
+  - `#SBATCH -o/-e logs/%x-%j.*` — check **`.out` for OK/FAIL**; `.err` is mostly HF/tqdm stderr
+
+### Job results (selected)
+
+| Job | Result |
+|-----|--------|
+| `adtc_setup_env-17259662` | **OK** — conda env created |
+| `adtc_dl_train-17259751` | **partial** — 8 OK, 2 FAIL, 2 SKIP |
+| `adtc_prep_data-17259783` | FAIL — CPT finished then HF datasets **GIL abort** on exit; `set -e` stopped pipeline |
+| `adtc_prep_data-17259791` | CPT soft-continued; SFT/EN STEM **OK**; **mix FAIL** |
+
+### Download train (`01`) status
+| Key | Status |
+|-----|--------|
+| `fineweb2_amh_100m` | OK (50k snapshot) |
+| `wikipedia_amharic` | OK |
+| `afrinllb` | OK |
+| `walia` | OK |
+| `finetome_am` | OK |
+| `r1_multilingual` | OK (2.4k after filter) |
+| `dolly_am` | OK |
+| `taco_am` | OK |
+| `amharic_news` | FAIL — gated (`HF_TOKEN` + Hub access) |
+| `afriquellm_gsm8k` | FAIL — missing / inaccessible on Hub |
+| `fineweb2_full`, `yoseali` | SKIP (by design) |
+
+Snapshots: `adtc/data/raw/snapshots/*.jsonl`.
+
+### Prep / normalize
+- CPT outputs present for fineweb / wikipedia / afrinllb (`amharic_news` skipped/gated)
+- SFT sources: `walia_sft_v0` (~122k), `finetome_am_sft_v0` (~83k), `dolly_am`, `taco_am`; `r1_am` empty after Amharic filter
+- `en_stem_sft_v0.jsonl` (2000) + stub `am_stem_sft_v0.jsonl` written
+- **`sft_mix_v0.jsonl` not written yet**
+
+### Bugs fixed (code)
+1. HF `datasets` teardown → `PyGILState_Release` abort after successful CPT — soft-continue in `02_prepare_data.sbatch`; normalize prefers **local snapshots** (no HF re-stream when snapshot exists)
+2. `mix_sft.read_jsonl` used `read_text().splitlines()` — Unicode line separators inside Amharic strings → `JSONDecodeError`. Now reads **physical `\n` only** (same for `dedup_against_eval` eval load)
+
+### Next
+1. Re-run `sbatch 02_prepare_data.sbatch` (or mix-only wrap) → confirm `data/train/sft_mix_v0.jsonl`
+2. `sbatch 03_download_models.sbatch` for Qwen3-1.7B + 4B (after env)
+3. Then `04_train_sft_1_7b.sbatch` (A100 / `bf16`)
+4. Optional: `HF_TOKEN` for gated `amharic_news`; replace stub MT with real Amharic before serious train
+5. Keep updating this DEVLOG after each meaningful HPC/data/train milestone
+
+---
+
+## 2026-08-16 — Base model download OK (Jubail)
+
+### Outcome
+Job `adtc_dl_models-17259908` **DONE ok** — both Phase 2/4 HF bases on scratch.
+
+| Key | HF id | Status |
+|-----|-------|--------|
+| `qwen3_1_7b` | `Qwen/Qwen3-1.7B` | OK |
+| `qwen3_4b` | `Qwen/Qwen3-4B` | OK |
+
+Cache: `adtc/data/raw/hf_home/models--Qwen--Qwen3-*`  
+Manifest: `adtc/training/model_download_manifest_v0.json`  
+Logs: `adtc/hpc/logs/adtc_dl_models-17259908.{out,err}`, `adtc/logs/download_models/`
+
+### Next
+1. Finish `sft_mix_v0.jsonl` (`02_prepare_data` / mix-only) if not already written
+2. `sbatch 04_train_sft_1_7b.sbatch` (A100)
+
+---
+
+## 2026-08-16 — Expand HF model download list (PRD Phase 2)
+
+### Outcome
+`training/download_base_models.py` + `03_download_models.sbatch` now pull the full Phase 2 screen shortlist (not only Qwen3).
+
+| Key | HF id | Role |
+|-----|-------|------|
+| `qwen3_1_7b` | `Qwen/Qwen3-1.7B` | efficiency (already cached) |
+| `qwen3_4b` | `Qwen/Qwen3-4B` | accuracy (already cached) |
+| `gemma3_4b` | `google/gemma-3-4b-it` | architecture control (**gated** — needs HF license + `HF_TOKEN`) |
+| `qwen25_3b_instruct` | `Qwen/Qwen2.5-3B-Instruct` | middle-size control |
+| `qwen35_2b` | `Qwen/Qwen3.5-2B` | optional llama.cpp compat check |
+| `qwen35_4b` | `Qwen/Qwen3.5-4B` | optional llama.cpp compat check |
+
+### Next
+1. `cd adtc/hpc && sbatch 03_download_models.sbatch` (export `HF_TOKEN` first for Gemma)
+2. Confirm `logs/download_models/latest.summary.json` ok for new keys
+
+---
+
+## 2026-08-16 — Load HF_TOKEN from adtc/.env in Slurm jobs
+
+### Outcome
+`adtc/.env` holds `HF_TOKEN` (gitignored). [`adtc/hpc/env.sh`](../hpc/env.sh) now sources it and sets `HUGGING_FACE_HUB_TOKEN` so gated Hub pulls (Gemma, news) work in jobs without exporting on the login shell.
+
+### Next
+1. Accept Gemma license on HF if not done
+2. `sbatch 03_download_models.sbatch` — expect `[env] HF_TOKEN=set` in the `.out`
+
+---
+
+## 2026-08-16 — Model download partial (Gemma gated)
+
+### Outcome
+Job `adtc_dl_models-17260204`: **partial** `ok=5 error=1`. Token loaded (`HF_TOKEN=set`).
+
+| Key | Status |
+|-----|--------|
+| qwen3_1_7b | OK (cache) |
+| qwen3_4b | OK (cache) |
+| gemma3_4b (`google/gemma-3-4b-it`) | **FAIL 403** — not on authorized list / license not accepted for this HF account |
+| qwen25_3b_instruct | OK |
+| qwen35_2b | OK |
+| qwen35_4b | OK |
+
+### Next
+1. On Hugging Face (same account as the token): open https://huggingface.co/google/gemma-3-4b-it → **Acknowledge license / ask for access**
+2. Re-run: `sbatch 03_download_models.sbatch` or  
+   `python training/download_base_models.py --only gemma3_4b`
+3. Proceed with SFT on Qwen3 once `sft_mix_v0.jsonl` exists (Gemma can wait)

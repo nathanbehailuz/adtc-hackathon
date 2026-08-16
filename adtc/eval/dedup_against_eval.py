@@ -36,11 +36,12 @@ def extract_prompt(obj: dict) -> str:
 def load_eval_hashes(eval_paths: list[Path]) -> set[str]:
     hashes: set[str] = set()
     for path in eval_paths:
-        for line in path.read_text(encoding="utf-8").splitlines():
-            if not line.strip():
-                continue
-            obj = json.loads(line)
-            hashes.add(text_hash(extract_prompt(obj)))
+        with path.open(encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                obj = json.loads(line)
+                hashes.add(text_hash(extract_prompt(obj)))
     return hashes
 
 
