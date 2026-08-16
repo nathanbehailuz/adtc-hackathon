@@ -166,11 +166,22 @@ Fluent speaker blind-reviews stratified outputs for: grammar, terminology, facts
 
 Work in order. **Do not skip decision gates.** Dates assume ~9 days to Gate 1 (16→25 Aug)—compress later phases if early gates slip.
 
+### Current status / working order (as of 16 Aug 2026)
+
+| Status | Phase | Notes |
+|--------|-------|--------|
+| **Done** | Phase 0 Gate 0 | Packaging smoke passed (SmolLM2 + pinned profiler). See `DEVLOG.md` / `TOOLING.md`. |
+| **Now** | Phase 1 → Phase 3 scaffolding → Phase 4 training code | Eval freeze + dataset builders + QLoRA scripts under `adtc/eval/`, `adtc/data/`, `adtc/training/`. No multi-GB model downloads today. |
+| **Tomorrow** | Phase 2 | Download/profile Must GGUFs (or pull HF bases on **cloud** for training). Hardware + accuracy screen. |
+| **Then** | Phase 4 run | QLoRA on cloud GPU using HF checkpoints; GGUF only for profiler/submission. |
+
+**Code locations:** datasets → [`adtc/docs/DATASETS.md`](./DATASETS.md), `adtc/data/`; eval scripts → `adtc/eval/`; fine-tune → `adtc/training/` (TRL + PEFT QLoRA).
+
+**Cloud vs laptop:** Train on cloud with Hugging Face (HF) weights. Convert merged checkpoint → GGUF for ADTC profiler / Gate 1. Laptop does not need every base model locally.
+
 ---
 
-
-
-### Phase 0 — Packaging truth (Day 0–1) — BLOCKING
+### Phase 0 — Packaging truth (Day 0–1) — BLOCKING — **DONE (Gate 0)**
 
 Goal: prove the submission loop works with a vanilla GGUF before any training.
 
@@ -185,24 +196,30 @@ Goal: prove the submission loop works with a vanilla GGUF before any training.
 | 0.6 | Decide hosting for final weights (HF public / release asset)                                       | Public URL strategy chosen                |
 
 
-**Gate 0:** Clean checkout downloads and profiles. If this fails, stop—do not fine-tune.
+**Gate 0:** Clean checkout downloads and profiles. If this fails, stop—do not fine-tune. **Passed 16 Aug 2026.**
 
 ---
 
 
 
-### Phase 1 — Language + eval freeze (Day 1)
+### Phase 1 — Language + eval freeze (Day 1) — **IN PROGRESS**
+
+**Amharic lock**
+- Target language: Amharic (`am` / Iroko HF configs often `amh`)
+- Fluent validator / owner: **Nathan Behailu**
+- `african_alpha_claim: true` in draft metadata; keep claim only if validation samples pass Phase 1 review
+- Coverage: Amharic is in IrokoBench (AfriMGSM / AfriMMLU / AfriXNLI)
 
 
 | #   | Task                                                                                                                       | Done when                                       |
 | --- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| 1.1 | List languages someone can validate                                                                                        | Named owner + language                          |
+| 1.1 | List languages someone can validate                                                                                        | Named owner + language — **Nathan / Amharic**   |
 | 1.2 | Cross-check Iroko / AfriQA / AfroBench coverage for that language                                                          | Language chosen with rationale written          |
 | 1.3 | Decide `african_alpha_claim` yes/no                                                                                        | Claim matches validation capacity               |
 | 1.4 | Build English STEM held-out set                                                                                            | Frozen file, no more edits without version bump |
-| 1.5 | Pull / subset AfriMGSM, AfriMMLU, AfriXNLI for language X                                                                  | Frozen eval scripts                             |
-| 1.6 | Write 100–300 custom tutoring items (EN↔X): solve, explain, first-error, one hint, simplify, related exercise, code-switch | Frozen JSON/CSV; out of train                   |
-| 1.7 | Build tokenizer fertility mini-set (parallel EN/X sentences)                                                               | Script computes F_X, R_{X/\mathrm{EN}}          |
+| 1.5 | Pull / subset AfriMGSM, AfriMMLU, AfriXNLI for Amharic (`amh`)                                                             | Frozen eval scripts under `adtc/eval/`          |
+| 1.6 | Write 100–300 custom tutoring items (EN↔am): solve, explain, first-error, one hint, simplify, related exercise, code-switch | Frozen JSONL in `adtc/data/eval/` (seed v0 first) |
+| 1.7 | Build tokenizer fertility mini-set (parallel EN/am sentences)                                                              | Script computes F_am, R_am/en                   |
 
 
 **Gate 1a:** Language + frozen eval exist. No synthetic train data yet.
@@ -211,9 +228,9 @@ Goal: prove the submission loop works with a vanilla GGUF before any training.
 
 
 
-### Phase 2 — Baseline screening (Day 1–2)
+### Phase 2 — Baseline screening — **DEFERRED (model-setup day / tomorrow)**
 
-Run **unadapted** models. Prefer official GGUFs. Measure EN-STEM, X-STEM, TPS, RSS at Q4 and Q6.
+Run **unadapted** models. Prefer official GGUFs on the profiler laptop **or** profile later; HF bases for training live on the **cloud**. Measure EN-STEM, Amharic-STEM, TPS, RSS at Q4 and Q6.
 
 
 | #   | Config                 | Priority                                                   |
@@ -241,18 +258,20 @@ Also run:
 
 
 
-### Phase 3 — Bilingual STEM data (Day 2–4)
+### Phase 3 — Bilingual STEM data (Day 2–4) — **scaffolding now**
 
 Build SFT data **after** eval freeze. Prefer educational STEM sources over bulk web crawl.
+
+**Code:** catalog [`DATASETS.md`](./DATASETS.md); builders in `adtc/data/`; dedup in `adtc/eval/dedup_against_eval.py`.
 
 
 | #   | Task                                                                                       | Done when                         |
 | --- | ------------------------------------------------------------------------------------------ | --------------------------------- |
-| 3.1 | Collect native X text pool (grammar/register)—keep **separate** for ablation               | Versioned corpus A                |
+| 3.1 | Collect native Amharic text pool (grammar/register)—keep **separate** for ablation         | Versioned corpus A                |
 | 3.2 | Collect / generate high-quality EN STEM tutoring examples                                  | Versioned corpus B                |
-| 3.3 | Translate EN STEM → X (MT); keep originals                                                 | Parallel corpus                   |
+| 3.3 | Translate EN STEM → Amharic (MT); keep originals                                           | Parallel corpus                   |
 | 3.4 | Fluent review of stratified translated samples (terms, algebra, units, negation, register) | Reject log + clean train set      |
-| 3.5 | Format instruction data in four directions: EN→EN, X→X, EN→X, X→EN                         | Balanced mix documented           |
+| 3.5 | Format instruction data in four directions: EN→EN, am→am, EN→am, am→EN                     | Balanced mix documented           |
 | 3.6 | Cover tutoring behaviors (not only final answers)                                          | Checklist covered in sample audit |
 | 3.7 | Dedup against frozen eval prompts                                                          | Zero exact/near overlap           |
 | 3.8 | Optional: teacher LLM (larger) generates/corrects examples—teacher **not** in submission   | Student-only train set            |
@@ -263,8 +282,8 @@ Build SFT data **after** eval freeze. Prefer educational STEM sources over bulk 
 
 | Pool              | Search range |
 | ----------------- | ------------ |
-| Native X          | 25–40%       |
-| Translated X STEM | 25–35%       |
+| Native Amharic    | 25–40%       |
+| Translated am STEM | 25–35%      |
 | EN math/science   | 15–25%       |
 | EN/general replay | 5–15%        |
 | Code/structured   | 5–15%        |
@@ -278,15 +297,17 @@ Start hypothesis near 35 / 25 / 20 / 10 / 10 if CPT runs.
 
 
 
-### Phase 4 — Adapt finalists (Day 3–5) — cloud GPU
+### Phase 4 — Adapt finalists — cloud GPU — **training code now; run after Phase 2**
+
+**Code:** `adtc/training/` — TRL + PEFT QLoRA (`train_sft_qlora.py`, `merge_lora.py`, YAML configs). Pull HF bases on the **server**; do not require local GGUF for training.
 
 
 | #   | Task                                                                                                                         | Done when                           |
 | --- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
 | 4.1 | QLoRA/SFT **efficiency** finalist first (likely Qwen3-1.7B) on same data recipe                                              | Merged + unmerged checkpoints saved |
-| 4.2 | Eval: EN-STEM, X-STEM, X-general, \Delta_{\text{forget}}, human sample                                                       | Numbers in results table            |
+| 4.2 | Eval: EN-STEM, am-STEM, am-general, \Delta_{\text{forget}}, human sample                                                     | Numbers in results table            |
 | 4.3 | Same recipe on **accuracy** finalist (4B Qwen or Gemma)                                                                      | Fair compare                        |
-| 4.4 | **Decision:** Is direct-X competence still weak? (large direct-X vs translate-test gap, poor prose, morphology, terminology) | Yes → 4.5; No → skip CPT            |
+| 4.4 | **Decision:** Is direct-Amharic competence still weak? (large direct-am vs translate-test gap, poor prose, morphology, terminology) | Yes → 4.5; No → skip CPT     |
 | 4.5 | (Conditional) Mixed CPT → SFT on the model that needs it                                                                     | CPT justified in report             |
 | 4.6 | (Conditional) Tokenizer extension **only** if fertility severe                                                               | Otherwise skip                      |
 | 4.7 | Merge adapters for deployment candidate(s); keep unmerged for reproducibility                                                | One merge per finalist              |
@@ -377,14 +398,14 @@ Screen (8 cheap configs) → keep top efficiency + top accuracy
 ## 7. Roles & ownership (fill in)
 
 
-| Role                              | Owner | Notes               |
-| --------------------------------- | ----- | ------------------- |
-| Submission / packaging / profiler |       | Phase 0 + 7         |
-| Language validation               |       | Must be fluent in X |
-| Data + translation QC             |       |                     |
-| Training (QLoRA / CPT)            |       | Cloud GPU           |
-| Eval harness + tables             |       |                     |
-| Report + video                    |       |                     |
+| Role                              | Owner           | Notes                          |
+| --------------------------------- | --------------- | ------------------------------ |
+| Submission / packaging / profiler | Nathan Behailu  | Phase 0 + 7                    |
+| Language validation               | Nathan Behailu  | Amharic                        |
+| Data + translation QC             |                 |                                |
+| Training (QLoRA / CPT)            |                 | Cloud GPU                      |
+| Eval harness + tables             |                 |                                |
+| Report + video                    |                 |                                |
 
 
 ---

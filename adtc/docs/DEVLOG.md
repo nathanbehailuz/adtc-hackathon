@@ -71,8 +71,22 @@ Key metrics (`phase0_submission_smoke.json`):
 ### 0.6 Hosting decision
 **Final weights:** public Hugging Face GGUF (credential-free). Backup: GitHub Release asset. Documented in TOOLING.md. Phase 0 retains SmolLM2 HF URL.
 
-### Follow-ups before Phase 1
+### Follow-ups before / during Phase 1
 1. Push Phase 0 `metadata.json` to `origin` so a pure remote clone matches the Amharic STEM draft
-2. Replace `REPLACE_ME_*` with real `team_id` / submitter
-3. Assign Amharic fluent validator (Phase 1)
+2. Replace `REPLACE_ME_ADTF_TEAM_ID` with real `team_id` (submitter fields filled: Nathan Behailu / nz2212@nyu.edu / nathanbehailuz)
+3. Amharic fluent validator: **Nathan Behailu**
 4. Keep profiler on pinned SHA for all later scores
+
+---
+
+## 2026-08-16 — Data + fine-tune scaffold (models deferred)
+
+### Schedule shift
+- **Phase 2** (GGUF / HF model pulls + baseline screen) deferred to **tomorrow / cloud**
+- **Today:** Phase 1 eval freeze scripts, Phase 3 dataset builders, Phase 4 TRL+PEFT QLoRA training code
+- Train on **cloud** with HF checkpoints; GGUF only for profiler/submission
+
+### Artifacts added
+- `adtc/docs/DATASETS.md` — source catalog
+- `adtc/data/`, `adtc/eval/`, `adtc/training/` — pipelines and QLoRA scripts
+- PRD updated with current working order + Amharic Phase 1 lock
