@@ -14,9 +14,13 @@ cd /scratch/nz2212/adtc-hackathon/adtc/hpc
 
 ```bash
 # NYUAD VPN + SSH to Jubail login, then:
-cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+cd /scratch/nz2212/adtc-hackathon/adtc/hpc   # required — Slurm uses this as SLURM_SUBMIT_DIR
 bash submit_chain.sh
+# or one stage:
+sbatch setup_env.sbatch
 ```
+
+Always `cd` into `adtc/hpc` before `sbatch`. Jobs resolve paths via `SLURM_SUBMIT_DIR` (Slurm’s spool copy of the script is not writable).
 
 That submits (with `afterok` dependencies):
 

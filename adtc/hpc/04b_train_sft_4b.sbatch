@@ -12,7 +12,7 @@
 # Download 4B first: sbatch 03_download_models.sbatch --only is baked for 1.7B;
 #   run: python training/download_base_models.py --only qwen3_4b
 set -euo pipefail
-HPC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HPC_DIR="${SLURM_SUBMIT_DIR:?SLURM_SUBMIT_DIR unset; sbatch from adtc/hpc/}"
 # shellcheck disable=SC1091
 source "${HPC_DIR}/env.sh"
 

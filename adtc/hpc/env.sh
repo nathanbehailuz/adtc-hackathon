@@ -4,10 +4,14 @@
 # See: https://crc-docs.abudhabi.nyu.edu/hpc/software/hpc_pytorch.html
 set -euo pipefail
 
-_HPC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ADTC_ROOT="$(cd "${_HPC_DIR}/.." && pwd)"
-
-# Always operate relative to adtc/ (submit from adtc/hpc/ so Slurm logs/ lands here)
+# Slurm copies the batch script to a spool path; BASH_SOURCE is NOT the submit dir.
+# Always prefer SLURM_SUBMIT_DIR (user must sbatch from adtc/hpc/).
+if [[ -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+  HPC_DIR="${SLURM_SUBMIT_DIR}"
+else
+  HPC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+ADTC_ROOT="$(cd "${HPC_DIR}/.." && pwd)"
 cd "${ADTC_ROOT}"
 
 CONDA_ENV="${ADTC_ROOT}/training/.conda-env"
@@ -32,6 +36,8 @@ if [[ ! -f "${MINICONDA_ACTIVATE}" ]]; then
   echo "error: Miniconda activate not found at ${MINICONDA_ACTIVATE}" >&2
   exit 1
 fi
+# Conda activate.d scripts reference unset vars; nounset must be off here.
+set +u
 # shellcheck disable=SC1090
 source "${MINICONDA_ACTIVATE}"
 
@@ -41,7 +47,9 @@ if [[ ! -d "${CONDA_ENV}" ]]; then
   exit 1
 fi
 conda activate "${CONDA_ENV}"
+set -u
 
+echo "[env] HPC_DIR=${HPC_DIR}"
 echo "[env] ADTC_ROOT=${ADTC_ROOT}"
 echo "[env] CONDA_PREFIX=${CONDA_PREFIX:-}"
 echo "[env] HF_HOME=${HF_HOME}"

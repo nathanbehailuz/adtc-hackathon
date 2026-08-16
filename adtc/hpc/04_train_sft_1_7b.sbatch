@@ -10,7 +10,7 @@
 
 # QLoRA SFT — Qwen3-1.7B (bf16 requires A100+; do not use V100).
 set -euo pipefail
-HPC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HPC_DIR="${SLURM_SUBMIT_DIR:?SLURM_SUBMIT_DIR unset; sbatch from adtc/hpc/}"
 # shellcheck disable=SC1091
 source "${HPC_DIR}/env.sh"
 

@@ -8,22 +8,26 @@
 #SBATCH -e logs/%x-%j.err
 
 # One-time: create scratch conda env + install training deps (CUDA torch).
-# Do not run on login nodes.
+# Submit from adtc/hpc/ (login node):  sbatch setup_env.sbatch
 set -euo pipefail
 
-HPC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Slurm spool ≠ submit dir — never use BASH_SOURCE for paths on Jubail.
+HPC_DIR="${SLURM_SUBMIT_DIR:?SLURM_SUBMIT_DIR unset; sbatch from adtc/hpc/}"
 ADTC_ROOT="$(cd "${HPC_DIR}/.." && pwd)"
 CONDA_ENV="${ADTC_ROOT}/training/.conda-env"
 MINICONDA_ACTIVATE="/share/apps/NYUAD5/miniconda/3-4.11.0/bin/activate"
 REQS="${ADTC_ROOT}/training/requirements.txt"
 
 cd "${HPC_DIR}"
-mkdir -p logs
+mkdir -p "${HPC_DIR}/logs"
 
 if command -v module >/dev/null 2>&1; then
   module purge 2>/dev/null || true
 fi
 
+# Conda activate scripts reference unset vars (e.g. MKL_INTERFACE_LAYER);
+# nounset must be off while sourcing/activating.
+set +u
 # shellcheck disable=SC1090
 source "${MINICONDA_ACTIVATE}"
 
@@ -35,6 +39,7 @@ else
 fi
 
 conda activate "${CONDA_ENV}"
+set -u
 
 # Install CUDA-capable torch first, then the rest of training requirements.
 # A100 (sm_80) — matches nvidia partition jobs that request --gres=gpu:a100:1
