@@ -49,7 +49,18 @@ ls -t logs/download_train/*.log | head -1 | xargs cat
 | download_models | `training/model_download_manifest_v0.json` |
 | train_sft / train_cpt | `training/runs/.../train_metrics.json` |
 
-## HPC tomorrow order (with logs)
+## HPC / Jubail order (with logs)
+
+Prefer Slurm from a login node (see [`../hpc/README.md`](../hpc/README.md)):
+
+```bash
+cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+bash submit_chain.sh
+# resume mid-pipeline: CHAIN_FROM=4 bash submit_chain.sh
+# stage OK/FAIL still under adtc/logs/<stage>/; Slurm stdout in adtc/hpc/logs/
+```
+
+Equivalent plain Python (only inside an allocated job / interactive session — **not** on login):
 
 ```bash
 cd adtc

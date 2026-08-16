@@ -19,3 +19,6 @@ adtc/training/model_download_manifest_v0.json
 __pycache__/
 *.pyc
 .venv/
+adtc/training/.conda-env/
+adtc/hpc/logs/*
+!adtc/hpc/logs/.gitkeep

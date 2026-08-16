@@ -7,7 +7,20 @@ Training uses **Hugging Face** checkpoints. ADTC submission needs a **GGUF** aft
 
 **Run logs:** every stage below writes OK/FAIL under `adtc/logs/<stage>/`. See [`../docs/RUNLOGS.md`](../docs/RUNLOGS.md).
 
+## Jubail (Slurm)
+
+On NYUAD Jubail, do **not** train or download on login nodes. From `$SCRATCH`:
+
+```bash
+cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+bash submit_chain.sh    # setup → data → models → SFT 1.7B → merge
+```
+
+Details, partitions (A100), and monitor commands: [`../hpc/README.md`](../hpc/README.md).
+
 ## Setup (on the GPU machine)
+
+Local / interactive (non-Slurm):
 
 ```bash
 cd adtc/training
@@ -16,6 +29,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 # huggingface_hub is pulled in by transformers; needed for download_base_models.py
 ```
+
+On Jubail the preferred env is the scratch conda prefix created by `hpc/setup_env.sbatch`
+(`adtc/training/.conda-env`).
 
 ## Data (before train)
 
