@@ -1,0 +1,25 @@
+{
+  "version": "v0",
+  "files": [
+    {
+      "path": "data/eval/afrimgsm_amh_test_v0.jsonl",
+      "sha256": "6e6c654c45a7dd671b4588cf414a567eb6a54fea08c9998989534b4302ea6d8d",
+      "n_lines": 250
+    },
+    {
+      "path": "data/eval/afrimgsm_eng_test_v0.jsonl",
+      "sha256": "65c95e9fcf0dba1bef5d3858f9ca9a8056386a00364cc39dc362eff7506df8d2",
+      "n_lines": 250
+    },
+    {
+      "path": "data/eval/afrimmlu_amh_test_v0.jsonl",
+      "sha256": "50f43efa16fcb5394ee9b2d1fe49c7b089c9fd5a2491f47413ef050129ba7548",
+      "n_lines": 500
+    },
+    {
+      "path": "data/eval/afrixnli_amh_test_v0.jsonl",
+      "sha256": "288d76be6254e530060bc3da356177515daf8a000f9b37d5643624810a5eb827",
+      "n_lines": 600
+    }
+  ]
+}

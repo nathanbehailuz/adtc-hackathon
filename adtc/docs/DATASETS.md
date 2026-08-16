@@ -16,9 +16,11 @@ Language codes: BCP-47 `am` / Iroko HF configs often `amh`; English `en` / `eng`
 | AfriXNLI | [`masakhane/afrixnli`](https://huggingface.co/datasets/masakhane/afrixnli) | Amharic config if present | Language understanding |
 | Custom tutoring | `adtc/data/eval/custom_tutoring_v0.jsonl` | authored | Product behaviors |
 | EN STEM holdout | `adtc/data/eval/en_stem_holdout_v0.jsonl` | from GSM8K **test** only | Forgetting check |
-| Fertility parallels | `adtc/data/eval/fertility_parallel_v0.jsonl` | authored EN‖am | Tokenizer diagnostics |
+| Fertility parallels | `adtc/data/eval/fertility_parallel_v0.jsonl` | authored EN‖am | Tokenizer diagnostics (metrics in Phase 2) |
 
 Scripts: `adtc/eval/prepare_iroko_am.py`, `prepare_en_stem.py`, `fertility.py`.
+
+**Freeze:** see [`../data/eval/FREEZE.md`](../data/eval/FREEZE.md). Language decisions: [`LANGUAGE.md`](./LANGUAGE.md).
 
 **License note:** Iroko / Masakhane sets are typically CC BY-SA — keep attribution in REPORT.md; do not train on test splits.
 

@@ -171,7 +171,8 @@ Work in order. **Do not skip decision gates.** Dates assume ~9 days to Gate 1 (1
 | Status | Phase | Notes |
 |--------|-------|--------|
 | **Done** | Phase 0 Gate 0 | Packaging smoke passed (SmolLM2 + pinned profiler). See `DEVLOG.md` / `TOOLING.md`. |
-| **Now** | Phase 1 → Phase 3 scaffolding → Phase 4 training code | Eval freeze + dataset builders + QLoRA scripts under `adtc/eval/`, `adtc/data/`, `adtc/training/`. No multi-GB model downloads today. |
+| **Done** | Phase 1 Gate 1a | Language lock + frozen eval under `adtc/data/eval/` — see `LANGUAGE.md`, `FREEZE.md`. |
+| **Now** | Phase 3 data build | SFT builders exist; build/review train mixes **without** touching frozen eval. |
 | **Tomorrow** | Phase 2 | Download/profile Must GGUFs (or pull HF bases on **cloud** for training). Hardware + accuracy screen. |
 | **Then** | Phase 4 run | QLoRA on cloud GPU using HF checkpoints; GGUF only for profiler/submission. |
 
@@ -202,27 +203,28 @@ Goal: prove the submission loop works with a vanilla GGUF before any training.
 
 
 
-### Phase 1 — Language + eval freeze (Day 1) — **IN PROGRESS**
+### Phase 1 — Language + eval freeze — **DONE (Gate 1a)**
 
-**Amharic lock**
+**Amharic lock** — see [`LANGUAGE.md`](./LANGUAGE.md)
 - Target language: Amharic (`am` / Iroko HF configs often `amh`)
 - Fluent validator / owner: **Nathan Behailu**
-- `african_alpha_claim: true` in draft metadata; keep claim only if validation samples pass Phase 1 review
-- Coverage: Amharic is in IrokoBench (AfriMGSM / AfriMMLU / AfriXNLI)
+- `african_alpha_claim: true` (contingent on validation samples before Gate 1 submit)
+- Coverage: Amharic in IrokoBench (AfriMGSM / AfriMMLU / AfriXNLI)
+- Frozen files: [`adtc/data/eval/FREEZE.md`](../data/eval/FREEZE.md)
 
 
 | #   | Task                                                                                                                       | Done when                                       |
 | --- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| 1.1 | List languages someone can validate                                                                                        | Named owner + language — **Nathan / Amharic**   |
-| 1.2 | Cross-check Iroko / AfriQA / AfroBench coverage for that language                                                          | Language chosen with rationale written          |
-| 1.3 | Decide `african_alpha_claim` yes/no                                                                                        | Claim matches validation capacity               |
-| 1.4 | Build English STEM held-out set                                                                                            | Frozen file, no more edits without version bump |
-| 1.5 | Pull / subset AfriMGSM, AfriMMLU, AfriXNLI for Amharic (`amh`)                                                             | Frozen eval scripts under `adtc/eval/`          |
-| 1.6 | Write 100–300 custom tutoring items (EN↔am): solve, explain, first-error, one hint, simplify, related exercise, code-switch | Frozen JSONL in `adtc/data/eval/` (seed v0 first) |
-| 1.7 | Build tokenizer fertility mini-set (parallel EN/am sentences)                                                              | Script computes F_am, R_am/en                   |
+| 1.1 | List languages someone can validate                                                                                        | **Done** — Nathan / Amharic                     |
+| 1.2 | Cross-check Iroko / AfriQA / AfroBench coverage for that language                                                          | **Done** — `LANGUAGE.md`                        |
+| 1.3 | Decide `african_alpha_claim` yes/no                                                                                        | **Done** — `true`, contingent on review         |
+| 1.4 | Build English STEM held-out set                                                                                            | **Done** — `en_stem_holdout_v0.jsonl` (100)     |
+| 1.5 | Pull / subset AfriMGSM, AfriMMLU, AfriXNLI for Amharic (`amh`)                                                             | **Done** — frozen JSONL + `eval_manifest_v0.json` |
+| 1.6 | Write custom tutoring items (EN↔am); target 100–300                                                                        | **Done** — `custom_tutoring_v0.jsonl` (~100); expand to v1 before heavy train if needed |
+| 1.7 | Build tokenizer fertility mini-set (parallel EN/am sentences)                                                              | **Done** — set + script; metrics deferred to Phase 2 |
 
 
-**Gate 1a:** Language + frozen eval exist. No synthetic train data yet.
+**Gate 1a:** Language + frozen eval exist. No synthetic train data yet. **Passed 16 Aug 2026.**
 
 ---
 

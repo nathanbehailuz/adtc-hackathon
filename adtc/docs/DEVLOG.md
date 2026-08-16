@@ -90,3 +90,36 @@ Key metrics (`phase0_submission_smoke.json`):
 - `adtc/docs/DATASETS.md` — source catalog
 - `adtc/data/`, `adtc/eval/`, `adtc/training/` — pipelines and QLoRA scripts
 - PRD updated with current working order + Amharic Phase 1 lock
+
+---
+
+## 2026-08-16 — Phase 1 Gate 1a (Language + eval freeze)
+
+### Outcome
+**Gate 1a passed.** Frozen eval under `adtc/data/eval/`; no training data generated in this phase.
+
+### Language (1.1–1.3)
+- Doc: [`LANGUAGE.md`](./LANGUAGE.md)
+- Amharic / Nathan Behailu; `african_alpha_claim: true` (contingent on pre-submit review)
+
+### Frozen eval counts
+| File | Rows |
+|------|------|
+| `afrimgsm_amh_test_v0.jsonl` | 250 |
+| `afrimgsm_eng_test_v0.jsonl` | 250 |
+| `afrimmlu_amh_test_v0.jsonl` | 500 |
+| `afrixnli_amh_test_v0.jsonl` | 600 |
+| `en_stem_holdout_v0.jsonl` | 100 |
+| `custom_tutoring_v0.jsonl` | 101 |
+| `fertility_parallel_v0.jsonl` | 10 |
+
+Manifest: `eval_manifest_v0.json` (Iroko SHA256). Freeze rules: `adtc/data/eval/FREEZE.md`.
+
+### Amharic spot-check
+Nathan should review a stratified sample of Amharic rows in `custom_tutoring_v0.jsonl` (terminology, register, algebra). Log issues here; fix via `v1` if needed—do not rewrite v0 silently.
+
+### Fertility metrics
+Deferred to Phase 2: `python eval/fertility.py --tokenizer <HF_ID>` once bases are on cloud.
+
+### Next
+Phase 3: build SFT mixes with existing builders; dedup against frozen eval. Phase 2 model screen tomorrow / on cloud.
