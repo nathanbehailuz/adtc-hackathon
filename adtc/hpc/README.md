@@ -27,7 +27,7 @@ That submits (with `afterok` dependencies):
 1. `setup_env.sbatch` — scratch conda env + CUDA torch + `training/requirements.txt`
 2. `01_download_train.sbatch` — train corpora
 3. `02_prepare_data.sbatch` — normalize → EN STEM → stub MT → SFT mix
-4. `03_download_models.sbatch` — `Qwen/Qwen3-1.7B`
+4. `03_download_models.sbatch` — `Qwen/Qwen3-1.7B` + `Qwen/Qwen3-4B`
 5. `04_train_sft_1_7b.sbatch` — QLoRA on **A100** (`nvidia` partition)
 6. `05_merge_lora.sbatch` — merge adapter → HF folder
 

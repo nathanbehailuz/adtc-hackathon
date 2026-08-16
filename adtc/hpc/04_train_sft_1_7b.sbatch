@@ -13,6 +13,11 @@ set -euo pipefail
 HPC_DIR="${SLURM_SUBMIT_DIR:?SLURM_SUBMIT_DIR unset; sbatch from adtc/hpc/}"
 # shellcheck disable=SC1091
 source "${HPC_DIR}/env.sh"
+# Activate scratch training conda (created by setup_env.sbatch)
+set +u
+source /share/apps/NYUAD5/miniconda/3-4.11.0/bin/activate
+conda activate /scratch/nz2212/adtc-hackathon/adtc/training/.conda-env
+set -u
 
 cd "${ADTC_ROOT}/training"
 python -c "import torch; assert torch.cuda.is_available(), 'CUDA required'; print(torch.cuda.get_device_name(0))"
