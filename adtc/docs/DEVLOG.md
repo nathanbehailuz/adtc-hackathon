@@ -123,3 +123,25 @@ Deferred to Phase 2: `python eval/fertility.py --tokenizer <HF_ID>` once bases a
 
 ### Next
 Phase 3: build SFT mixes with existing builders; dedup against frozen eval. Phase 2 model screen tomorrow / on cloud.
+
+---
+
+## 2026-08-16 — Pipeline run logging (HPC-ready)
+
+### Why
+Train-source download was stopped mid-run (FineWeb2 OK; gated news FAIL; Wikipedia in flight). Without incremental logs the manifest never flushed, so success/fail was unclear.
+
+### What
+- Shared logger: `adtc/lib/run_log.py` → `adtc/logs/<stage>/{*.log,*.jsonl,*.summary.json}`
+- Wired into: `download_train_sources`, `normalize_cpt_sources`, `normalize_sft_sources`, `mix_sft`, `download_base_models`, `train_sft_qlora`, `train_cpt_qlora`, `merge_lora`
+- Download also rewrites `data/raw/download_manifest_v0.json` **after each source** and on Ctrl+C
+- Doc: [`RUNLOGS.md`](./RUNLOGS.md); catalog note in [`DATASETS.md`](./DATASETS.md)
+
+### Known from partial local download
+| Key | Status |
+|-----|--------|
+| `fineweb2_amh_100m` | OK (50k snapshot) |
+| `amharic_news` | FAIL — gated HF dataset (needs `HF_TOKEN`) |
+| later sources | not finished (interrupted) |
+
+Tomorrow on HPC: re-run download (or `--only` remaining keys), then normalize → mix → `training/download_base_models.py` → SFT.

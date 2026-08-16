@@ -4,10 +4,16 @@ adtc/tools/llama.cpp/
 adtc/tools/*.tar.gz
 adtc/tools/PROFILER_SHA.txt
 adtc-2026-submission-template/model/
-adtc/data/raw/
 adtc/data/train/*.jsonl
 !adtc/data/train/.gitkeep
+adtc/data/train/sources/
+adtc/data/train/cpt/
+adtc/data/raw/
+adtc/data/train/sources/
+adtc/data/train/cpt/
 adtc/training/runs/
+adtc/logs/
+adtc/training/model_download_manifest_v0.json
 *.gguf
 .DS_Store
 __pycache__/

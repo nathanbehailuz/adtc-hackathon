@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""QLoRA supervised fine-tuning with TRL + PEFT.
+"""Optional continued pretraining (CPT) with TRL — run only if Phase 4 diagnostics require it.
 
-Example (cloud GPU):
-  pip install -r requirements.txt
-  python train_sft_qlora.py --config configs/qlora_qwen3_1_7b.yaml
+Expects CPT JSONL with a ``text`` field (from ``data/normalize_cpt_sources.py``).
 
-QLoRA 4-bit ≠ final GGUF Q4. After training, merge adapters then convert to GGUF.
+Example (cloud GPU, after SFT diagnostics say CPT is needed)::
 
-Run log: ``logs/train_sft/<run>.*``
+  python train_cpt_qlora.py --config configs/cpt_qwen3_1_7b.yaml
+
+Until a CPT config exists, this script still records a structured run log when invoked
+so HPC failures are inspectable under ``logs/train_cpt/``.
 """
 from __future__ import annotations
 
@@ -34,6 +35,15 @@ def main() -> None:
     parser.add_argument("--data", type=Path, default=None, help="Override data_path from config")
     args = parser.parse_args()
 
+    if not args.config.exists():
+        log = RunLogger("train_cpt", meta={"config": str(args.config)})
+        log.item_error(
+            "config",
+            f"missing config {args.config} — create configs/cpt_*.yaml only if Gate 4 triggers CPT",
+        )
+        log.finish(status="error")
+        raise SystemExit(1)
+
     cfg = load_config(args.config)
     here = Path(__file__).resolve().parent
     data_path = Path(args.data) if args.data else (here / cfg["data_path"]).resolve()
@@ -42,7 +52,7 @@ def main() -> None:
     model_id = cfg["model_name_or_path"]
 
     log = RunLogger(
-        "train_sft",
+        "train_cpt",
         meta={
             "config": str(args.config),
             "model_name_or_path": model_id,
@@ -81,8 +91,8 @@ def main() -> None:
         log.item_ok("load_model", hf_id=model_id)
 
         peft_config = LoraConfig(
-            r=int(cfg.get("lora_r", 16)),
-            lora_alpha=int(cfg.get("lora_alpha", 32)),
+            r=int(cfg.get("lora_r", 8)),
+            lora_alpha=int(cfg.get("lora_alpha", 16)),
             lora_dropout=float(cfg.get("lora_dropout", 0.05)),
             bias="none",
             task_type="CAUSAL_LM",
@@ -91,23 +101,8 @@ def main() -> None:
 
         log.item_start("load_data", path=str(data_path))
         ds = load_dataset("json", data_files=str(data_path), split="train")
-
-        def to_text(example: dict) -> dict:
-            messages = example["messages"]
-            if hasattr(tokenizer, "apply_chat_template"):
-                text = tokenizer.apply_chat_template(
-                    messages,
-                    tokenize=False,
-                    add_generation_prompt=False,
-                )
-            else:
-                parts = []
-                for m in messages:
-                    parts.append(f"{m['role'].upper()}: {m['content']}")
-                text = "\n".join(parts) + "\n"
-            return {"text": text}
-
-        ds = ds.map(to_text, remove_columns=[c for c in ds.column_names if c != "text"])
+        if "text" not in ds.column_names:
+            raise ValueError("CPT data must have a 'text' field")
         log.item_ok("load_data", path=str(data_path), n_rows=len(ds))
 
         sft_args = SFTConfig(
@@ -115,7 +110,7 @@ def main() -> None:
             num_train_epochs=float(cfg.get("num_train_epochs", 1)),
             per_device_train_batch_size=int(cfg.get("per_device_train_batch_size", 1)),
             gradient_accumulation_steps=int(cfg.get("gradient_accumulation_steps", 8)),
-            learning_rate=float(cfg.get("learning_rate", 2e-4)),
+            learning_rate=float(cfg.get("learning_rate", 1e-4)),
             lr_scheduler_type=cfg.get("lr_scheduler_type", "cosine"),
             warmup_ratio=float(cfg.get("warmup_ratio", 0.03)),
             logging_steps=int(cfg.get("logging_steps", 10)),
@@ -126,7 +121,7 @@ def main() -> None:
             report_to=cfg.get("report_to", "none"),
             max_length=int(cfg.get("max_seq_length", 2048)),
             dataset_text_field="text",
-            packing=False,
+            packing=bool(cfg.get("packing", True)),
         )
 
         trainer = SFTTrainer(
@@ -146,17 +141,16 @@ def main() -> None:
         metrics["model_name_or_path"] = model_id
         metrics["data_path"] = str(data_path)
         metrics["run_id"] = log.run_id
-        metrics["note"] = "QLoRA training complete. Merge adapters before GGUF conversion."
+        metrics["note"] = "CPT complete. Usually follow with SFT on the CPT adapter/base."
         (output_dir / "train_metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
         log.item_ok("train", metrics=metrics, adapter=str(output_dir / "adapter"))
         print(json.dumps(metrics, indent=2))
-        print(f"adapter saved to {output_dir / 'adapter'}")
     except KeyboardInterrupt:
-        log.warn("KeyboardInterrupt during SFT")
+        log.warn("KeyboardInterrupt during CPT")
         log.finish(status="interrupted", message="interrupted by user")
         raise SystemExit(130) from None
     except Exception as e:  # noqa: BLE001
-        log.item_error("train_sft", e)
+        log.item_error("train_cpt", e)
         log.finish(status="error")
         raise
 

@@ -260,23 +260,33 @@ Also run:
 
 
 
-### Phase 3 — Bilingual STEM data (Day 2–4) — **scaffolding now**
+### Phase 3 — Bilingual STEM data — **IN PROGRESS (train sources)**
 
-Build SFT data **after** eval freeze. Prefer educational STEM sources over bulk web crawl.
+Build SFT data **after** eval freeze. Prefer named Amharic CPT/SFT corpora + educational STEM over bulk web crawl. CPT corpora are **downloaded/normalized now** but CPT training runs only if Phase 4 diagnostics require it.
 
-**Code:** catalog [`DATASETS.md`](./DATASETS.md); builders in `adtc/data/`; dedup in `adtc/eval/dedup_against_eval.py`.
+**Code / catalog:** [`DATASETS.md`](./DATASETS.md); [`RUNLOGS.md`](./RUNLOGS.md); `adtc/data/download_train_sources.py`, `normalize_sft_sources.py`, `normalize_cpt_sources.py`, `mix_sft.py`; dedup `adtc/eval/dedup_against_eval.py`. Per-run OK/FAIL under `adtc/logs/<stage>/`.
+
+**First-experiment sources**
+
+| Stage | Datasets |
+|-------|----------|
+| CPT native | FineWeb2-amh_Ethi-100M, Amharic news |
+| CPT edu/parallel | AddisAI Wikipedia, AfriNLLB (capped) |
+| SFT Amharic | Walia, FineTome, AfriqueLLM GSM8K (am) |
+| SFT EN / MT | GSM8K train + SciQ + `build_translate_am.py` |
 
 
 | #   | Task                                                                                       | Done when                         |
 | --- | ------------------------------------------------------------------------------------------ | --------------------------------- |
-| 3.1 | Collect native Amharic text pool (grammar/register)—keep **separate** for ablation         | Versioned corpus A                |
-| 3.2 | Collect / generate high-quality EN STEM tutoring examples                                  | Versioned corpus B                |
-| 3.3 | Translate EN STEM → Amharic (MT); keep originals                                           | Parallel corpus                   |
-| 3.4 | Fluent review of stratified translated samples (terms, algebra, units, negation, register) | Reject log + clean train set      |
+| 3.0 | Download + normalize Amharic CPT/SFT shortlist (`download_train_sources.py`)              | Manifest + `logs/download_train/` + `train/sources`, `train/cpt` |
+| 3.1 | Collect native Amharic text pool (FineWeb2-100M + news)—keep **separate** for ablation     | Versioned CPT corpus              |
+| 3.2 | Collect EN STEM tutoring (GSM8K train / SciQ) + Amharic STEM (AfriqueLLM GSM8K)            | Versioned SFT pools               |
+| 3.3 | Translate EN STEM → Amharic (MT); keep originals; merge with Walia/FineTome                 | Parallel + instruct mix           |
+| 3.4 | Fluent review of stratified Amharic / translated samples                                   | Reject log + clean train set      |
 | 3.5 | Format instruction data in four directions: EN→EN, am→am, EN→am, am→EN                     | Balanced mix documented           |
 | 3.6 | Cover tutoring behaviors (not only final answers)                                          | Checklist covered in sample audit |
 | 3.7 | Dedup against frozen eval prompts                                                          | Zero exact/near overlap           |
-| 3.8 | Optional: teacher LLM (larger) generates/corrects examples—teacher **not** in submission   | Student-only train set            |
+| 3.8 | Optional: teacher LLM / R1 / Dolly / TACO after dedup—teacher **not** in submission        | Student-only train set            |
 
 
 **Suggested CPT mixture ranges (only if Phase 4 triggers CPT):**
