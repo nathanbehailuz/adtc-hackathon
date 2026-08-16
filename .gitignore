@@ -1,0 +1,7 @@
+# Local / generated (do not commit)
+adtc/tools/adtc-profiler-venv/
+adtc/tools/llama.cpp/
+adtc/tools/*.tar.gz
+adtc/tools/PROFILER_SHA.txt
+adtc-2026-submission-template/model/
+.DS_Store

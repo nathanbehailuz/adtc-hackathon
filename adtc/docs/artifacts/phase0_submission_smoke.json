@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.1.0",
+  "profiler_version": "adtc-profiler 0.1.0",
+  "submission": {
+    "team_id": "REPLACE_ME_ADTF_TEAM_ID",
+    "domain": "math_scientific_reasoning",
+    "language_scope": [
+      "en",
+      "am"
+    ],
+    "african_alpha_claim": true,
+    "budget_laptop_claim": true,
+    "submitter": {
+      "name": "REPLACE_ME_NAME",
+      "email": "REPLACE_ME_EMAIL@example.com",
+      "github_handle": "REPLACE_ME_GITHUB"
+    },
+    "cross_disciplinary_pairing": {
+      "discipline": "education",
+      "load_bearing": true,
+      "description": "Offline bilingual Amharic/English STEM tutor for students and teachers on an 8 GB budget laptop with no network required at inference."
+    },
+    "test_prompts": [
+      {
+        "prompt_id": "tp_001",
+        "prompt": "A student writes 3/4 + 1/2 = 4/6. Identify the first mistake, then give one hint that helps them correct it without revealing the final answer."
+      },
+      {
+        "prompt_id": "tp_002",
+        "prompt": "አንድ ተማሪ 2x + 5 = 13 ብሎ ጽፎ x = 9 አለ። የመጀመሪያውን ስህተት ጠቁም፣ ከዚያም መልሱን ሳትገልጽ አንድ ፍንጭ ስጥ።"
+      }
+    ],
+    "model": {
+      "name": "SmolLM2-135M-Instruct-Q4_K_M",
+      "runtime": "llama.cpp",
+      "quantization": "GGUF Q4_K_M",
+      "parameters_estimate": "135M",
+      "packaging": "binary_bundle"
+    }
+  },
+  "environment": {
+    "measured_on": "participant_laptop",
+    "cpu_model": "Apple M1",
+    "ram_gb": 8.0,
+    "gpu": "integrated only",
+    "os": "macOS-26.5-arm64-arm-64bit"
+  },
+  "throughput": {
+    "tokens_per_second_generation": 86.45,
+    "first_token_latency_ms": 1312.71,
+    "prompt_tokens": 512,
+    "generated_tokens": 128
+  },
+  "memory": {
+    "peak_rss_mb": 270.58,
+    "steady_state_rss_mb": 220.73,
+    "peak_vms_mb": 827122.86
+  },
+  "accuracy": [],
+  "cpu_thermal": {
+    "cpu_percent_p99": 100.0,
+    "core_temp_c_peak": null,
+    "throttled": false
+  },
+  "reproducibility": {
+    "git_commit_sha": "63ddc5422404",
+    "docker_image_digest": "unknown",
+    "random_seed": 42
+  },
+  "model_info": {
+    "params_count": 134515008,
+    "context_length": 8192,
+    "architecture": "llama",
+    "claimed_params_estimate": "135M",
+    "params_match": true
+  }
+}
