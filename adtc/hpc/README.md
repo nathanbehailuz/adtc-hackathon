@@ -29,8 +29,10 @@ That submits (with `afterok` dependencies):
 3. `02_prepare_data.sbatch` — normalize → EN STEM → stub MT → SFT mix
 4. `03_download_models.sbatch` — Phase 2 HF bases: Qwen3-1.7B/4B, Gemma 3 4B-IT, Qwen2.5-3B-Instruct, Qwen3.5-2B/4B
 
-5. `04_train_sft_1_7b.sbatch` — QLoRA on **A100** (`nvidia` partition)
-6. `05_merge_lora.sbatch` — merge adapter → HF folder
+5. `04_train_sft_1_7b.sbatch` / `04b_train_sft_4b.sbatch` — single-model QLoRA
+6. **`04_train_sft_all.sbatch`** — sequential QLoRA: 1.7B → 4B → Qwen2.5-3B → Gemma3-4B (48h A100)
+7. `05_merge_lora.sbatch` — merge adapter → HF folder
+
 
 Optional later:
 

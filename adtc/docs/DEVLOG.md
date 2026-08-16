@@ -277,3 +277,58 @@ Job `adtc_dl_models-17260204`: **partial** `ok=5 error=1`. Token loaded (`HF_TOK
 2. Re-run: `sbatch 03_download_models.sbatch` or  
    `python training/download_base_models.py --only gemma3_4b`
 3. Proceed with SFT on Qwen3 once `sft_mix_v0.jsonl` exists (Gemma can wait)
+
+---
+
+## 2026-08-16 — Note: cancel Slurm jobs with scancel
+
+`kill <JOBID>` does not cancel queue jobs (no local PID). Use:
+
+```bash
+scancel 17260232          # one job
+scancel -u $USER          # all your jobs
+squeue -u $USER           # confirm gone
+```
+
+Pending (`PD`, reason `Priority`) means waiting in the nvidia queue — not running yet.
+
+---
+
+## 2026-08-16 — Single Slurm job to train all SFT configs
+
+### Outcome
+Added [`adtc/hpc/04_train_sft_all.sbatch`](../hpc/04_train_sft_all.sbatch): one A100 job, 48h, trains in order:
+
+1. `qlora_qwen3_1_7b.yaml`
+2. `qlora_qwen3_4b.yaml`
+3. `qlora_qwen25_3b_instruct.yaml` (new)
+4. `qlora_gemma3_4b.yaml` (new; needs Gemma download / HF access)
+
+Continues on per-model failure so Gemma gate does not block Qwen runs. Qwen3.5 excluded (compat check only).
+
+`sft_mix_v0.jsonl` is present on scratch (~3.5 MB).
+
+### Next
+```bash
+cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+sbatch 04_train_sft_all.sbatch
+# cancel: scancel <jobid>
+```
+
+---
+
+## 2026-08-16 — Fix SFTConfig warmup for new transformers/TRL
+
+### Outcome
+Job `adtc_sft_all-17260256` failed all 4 configs with:
+`TypeError: SFTConfig.__init__() got an unexpected keyword argument 'warmup_ratio'`
+
+Installed transformers uses `warmup_steps` only (float in `[0,1)` = ratio). Updated `train_sft_qlora.py` and `train_cpt_qlora.py` to map `warmup_ratio` from YAML → `warmup_steps`.
+
+Models loaded and data mapped fine before the crash (A100, mix 2000 rows).
+
+### Next
+```bash
+cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+sbatch 04_train_sft_all.sbatch
+```

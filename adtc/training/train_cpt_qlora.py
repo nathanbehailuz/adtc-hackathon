@@ -105,6 +105,8 @@ def main() -> None:
             raise ValueError("CPT data must have a 'text' field")
         log.item_ok("load_data", path=str(data_path), n_rows=len(ds))
 
+        # Transformers removed warmup_ratio; float in [0,1) for warmup_steps = ratio of total steps.
+        warmup = float(cfg.get("warmup_steps", cfg.get("warmup_ratio", 0.03)))
         sft_args = SFTConfig(
             output_dir=str(output_dir),
             num_train_epochs=float(cfg.get("num_train_epochs", 1)),
@@ -112,7 +114,7 @@ def main() -> None:
             gradient_accumulation_steps=int(cfg.get("gradient_accumulation_steps", 8)),
             learning_rate=float(cfg.get("learning_rate", 1e-4)),
             lr_scheduler_type=cfg.get("lr_scheduler_type", "cosine"),
-            warmup_ratio=float(cfg.get("warmup_ratio", 0.03)),
+            warmup_steps=warmup,
             logging_steps=int(cfg.get("logging_steps", 10)),
             save_steps=int(cfg.get("save_steps", 200)),
             bf16=bool(cfg.get("bf16", True)),
