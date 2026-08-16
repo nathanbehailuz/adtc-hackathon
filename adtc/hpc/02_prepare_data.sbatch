@@ -20,8 +20,14 @@ set -u
 
 cd "${ADTC_ROOT}"
 
-python data/normalize_cpt_sources.py
-python data/normalize_sft_sources.py
+# CPT: snapshot-only (skip gated/missing). Soft-fail if interpreter teardown aborts.
+python data/normalize_cpt_sources.py || {
+  echo "[prep] warn: normalize_cpt exited non-zero; continuing if CPT outputs exist"
+  test -f data/train/cpt/cpt_normalize_summary_v0.json
+}
+
+# Skip afriquellm_gsm8k until that snapshot exists (download failed last run).
+python data/normalize_sft_sources.py --sources walia finetome r1 dolly taco
 python data/build_en_stem_sft.py --limit 2000
 
 python data/build_translate_am.py \
