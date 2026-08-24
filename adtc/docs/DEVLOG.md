@@ -780,7 +780,7 @@ Committed the long uncommitted backlog (since `installed llama.cpp`) as seven fo
 | `922c92c` | Gemma **v3** CPT→SFT |
 | `405b96b` | Gemma **v4** SFT + briefing |
 | `cf883c2` | AfriqueQwen **v5** infra / preflight |
-| (this) | Docs index / PRD / HPC README / DEVLOG catch-up |
+| `65cf22b` | Docs index / PRD / HPC README / DEVLOG catch-up |
 
 ### Next
 1. Optional: `git push origin main` when ready.
