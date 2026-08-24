@@ -1,5 +1,8 @@
 # Datasets catalog — EN + Amharic STEM tutor
 
+**On-disk status (what was downloaded, splits, row counts):** [`DATASETS_REPORT.md`](./DATASETS_REPORT.md).  
+**Measured eval / profiler / leaderboard:** [`RESULTS_REPORT.md`](./RESULTS_REPORT.md).
+
 **Rule:** frozen eval never enters training. Dedup train against `adtc/data/eval/` before every mix.
 
 Language codes: BCP-47 `am` / Iroko HF configs often `amh`; English `en` / `eng`. FineWeb Amharic: `amh_Ethi`.
@@ -69,6 +72,8 @@ Suggested CPT mix (when triggered): native ~35% / translated-edu+parallel ~25% /
 | EN science QA | [`allenai/sciq`](https://huggingface.co/datasets/allenai/sciq) train | same builder |
 | Own translated STEM | MT via `build_translate_am.py` | Review before heavy use |
 | Supplementary | [`iocuydi/amharic-dolly-15k`](https://huggingface.co/datasets/iocuydi/amharic-dolly-15k), [`CRLannister/Amharic`](https://huggingface.co/datasets/CRLannister/Amharic) | After Walia/FineTome dedup |
+
+**Train mixes on disk (16 Aug 2026):** `data/train/sft_mix_v0.jsonl` (stub MT); `data/train/sft_mix_v1.jsonl` (NLLB-200 real MT — see `docs/artifacts/sft_mix_v1_direction_counts.json`). **AfriqueLLM GSM8K** Hub snapshot still missing from downloads — known gap (not in mix_v1).
 
 ### SFT row schema (JSONL)
 

@@ -172,9 +172,12 @@ Work in order. **Do not skip decision gates.** Dates assume ~9 days to Gate 1 (1
 |--------|-------|--------|
 | **Done** | Phase 0 Gate 0 | Packaging smoke passed (SmolLM2 + pinned profiler). See `DEVLOG.md` / `TOOLING.md`. |
 | **Done** | Phase 1 Gate 1a | Language lock + frozen eval under `adtc/data/eval/` — see `LANGUAGE.md`, `FREEZE.md`. |
-| **Now** | Phase 3 data build | SFT builders exist; build/review train mixes **without** touching frozen eval. |
-| **Tomorrow** | Phase 2 | Download/profile Must GGUFs (or pull HF bases on **cloud** for training). Hardware + accuracy screen. |
-| **Then** | Phase 4 run | QLoRA on cloud GPU using HF checkpoints; GGUF only for profiler/submission. |
+| **Done** | Phase 2 Gate 2 | Fertility + unadapted GGUF HPC profiler; efficiency finalist Qwen3-1.7B, accuracy finalist Gemma 3 4B. |
+| **Done** | Phase 3 Gate 3 | `sft_mix_v1` via NLLB-200 + Amharic review sample (no full retrain). |
+| **Done** | Phase 4 Gate 4 | Adapted HF eval table; **skip CPT** for Gate 1 deadline. |
+| **Done** | Phase 5 Gate 5 | Adapted GGUF PTQ + HPC profiler; winner **`qwen3_1_7b_merged_v0-Q4_K_M`**. |
+| **Now** | Phase 7 package | Point submission template at winner GGUF; REPORT / demo. |
+| **Optional** | Phase 6 | Ablations if time. |
 
 **Code locations:** datasets → [`adtc/docs/DATASETS.md`](./DATASETS.md), `adtc/data/`; eval scripts → `adtc/eval/`; fine-tune → `adtc/training/` (TRL + PEFT QLoRA).
 

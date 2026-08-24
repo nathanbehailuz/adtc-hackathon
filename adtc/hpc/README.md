@@ -44,11 +44,24 @@ sbatch 06_fertility.sbatch
 sbatch 06a_download_unadapted_gguf.sbatch
 # after build + download:
 sbatch --dependency=afterok:<build>:<dl> 06b_profile_unadapted.sbatch
-sbatch 06c_translate_test.sbatch          # nvidia GPU
+sbatch 06c_translate_test.sbatch          # nvidia GPU — full AfriMGSM unless LIMIT=
 sbatch 02b_nllb_mix_v1.sbatch             # nvidia GPU — NLLB-200 → sft_mix_v1
-sbatch 07_eval_adapted.sbatch             # nvidia GPU — four merged HF evals
+sbatch 07_eval_adapted.sbatch             # nvidia GPU — four merged HF evals (full frozen sets)
 sbatch --dependency=afterok:<build> 08_convert_gguf.sbatch
 sbatch --dependency=afterok:<convert> 09_profile_gguf.sbatch
+sbatch 10_perf_eval.sbatch                # compute CPU — GGUF frozen + translate (full) + profiler
+sbatch 11_try_prompt.sbatch               # compute CPU — one GGUF + one prompt (MODEL=/PROMPT=)
+
+# Amharic STEM SFT v2 (Gemma + Qwen3-1.7B; does not overwrite v0):
+bash submit_v2_chain.sh
+# or stepwise:
+#   sbatch 02c_download_am_gsm8k.sbatch
+#   sbatch 02d_prepare_mix_v2.sbatch
+#   sbatch 04c_train_sft_v2.sbatch
+#   sbatch 05b_merge_lora_v2.sbatch
+#   sbatch 08b_convert_gguf_v2.sbatch
+#   sbatch 12_eval_v2.sbatch              # CPU GGUF (judge-like, slow)
+#   sbatch 12b_eval_v2_hf.sbatch          # GPU HF merged v2 (fast gate)
 ```
 
 Shared helpers: [`env.sh`](env.sh), [`profiler_env.sh`](profiler_env.sh).

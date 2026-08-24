@@ -60,9 +60,11 @@ HF base → **QLoRA SFT** (cloud/HPC GPU) → merge LoRA → high-precision GGUF
 |-----|----------|
 | [`adtc/docs/PRD.md`](adtc/docs/PRD.md) | Product + step-by-step plan |
 | [`adtc/docs/DATASETS.md`](adtc/docs/DATASETS.md) | Train / eval sources |
+| [`adtc/docs/RESULTS_REPORT.md`](adtc/docs/RESULTS_REPORT.md) | Measured eval / profiler / leaderboard |
 | [`adtc/docs/LANGUAGE.md`](adtc/docs/LANGUAGE.md) | Amharic language lock |
 | [`adtc/docs/TOOLING.md`](adtc/docs/TOOLING.md) | Profiler / llama.cpp pins |
 | [`adtc/docs/DEVLOG.md`](adtc/docs/DEVLOG.md) | Day-to-day progress |
+| [`adtc/docs/GEMMA_V4_CONTEXT.md`](adtc/docs/GEMMA_V4_CONTEXT.md) | Gemma v4 architecture / data / hypers / eval briefing for external LLMs |
 | [`adtc/hpc/README.md`](adtc/hpc/README.md) | Jubail Slurm |
 
 ## Acknowledgement (HPC)
