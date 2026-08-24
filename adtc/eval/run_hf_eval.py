@@ -62,8 +62,14 @@ def gen(model, tok, prompt: str, max_new: int = 96) -> str:
     return tok.decode(gen_ids, skip_special_tokens=True)
 
 
-def score_qa(model, tok, rows: list[dict], qkey: str, akey: str, limit: int) -> dict:
-    rows = rows[:limit]
+def take(rows: list, limit: int | None) -> list:
+    if limit is None:
+        return rows
+    return rows[:limit]
+
+
+def score_qa(model, tok, rows: list[dict], qkey: str, akey: str, limit: int | None) -> dict:
+    rows = take(rows, limit)
     ok = 0
     for r in rows:
         pred = normalize_ans(gen(model, tok, r[qkey]))
@@ -73,8 +79,8 @@ def score_qa(model, tok, rows: list[dict], qkey: str, akey: str, limit: int) -> 
     return {"n": len(rows), "correct": ok, "acc": ok / n}
 
 
-def score_mmlu(model, tok, rows: list[dict], limit: int) -> dict:
-    rows = rows[:limit]
+def score_mmlu(model, tok, rows: list[dict], limit: int | None) -> dict:
+    rows = take(rows, limit)
     ok = 0
     letters = ["A", "B", "C", "D"]
     for r in rows:
@@ -93,9 +99,9 @@ def score_mmlu(model, tok, rows: list[dict], limit: int) -> dict:
     return {"n": len(rows), "correct": ok, "acc": ok / n}
 
 
-def score_tutoring(model, tok, rows: list[dict], limit: int) -> dict:
-    """Smoke: model produces non-empty reply; count as soft pass if len>20."""
-    rows = rows[:limit]
+def score_tutoring(model, tok, rows: list[dict], limit: int | None) -> dict:
+    """Soft pass if the model produces a non-empty reply (len>20)."""
+    rows = take(rows, limit)
     ok = 0
     samples = []
     for r in rows:
@@ -115,7 +121,12 @@ def score_tutoring(model, tok, rows: list[dict], limit: int) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--model", required=True)
-    ap.add_argument("--limit", type=int, default=50)
+    ap.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Cap items per suite (default: all frozen rows)",
+    )
     ap.add_argument("--out", type=Path, required=True)
     args = ap.parse_args()
 
@@ -148,7 +159,7 @@ def main() -> None:
     report["suites"]["en_stem_holdout"] = score_qa(model, tok, hold, "question", "answer", args.limit)
 
     tut = load_jsonl(eval_dir / "custom_tutoring_v0.jsonl")
-    report["suites"]["custom_tutoring"] = score_tutoring(model, tok, tut, min(20, args.limit))
+    report["suites"]["custom_tutoring"] = score_tutoring(model, tok, tut, args.limit)
 
     # forget proxy: EN holdout vs AM MGSM gap note
     report["forget_proxy"] = {

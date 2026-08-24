@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "measured_on": "jubail_hpc",
+  "formula": "0.5*S_acc + 0.3*S_tps + 0.2*S_mem",
+  "models": [
+    {
+      "rank": 1,
+      "model_key": "qwen3_1_7b_merged_v0-Q4_K_M",
+      "gguf_path": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/qwen3_1_7b_merged_v0-Q4_K_M.gguf",
+      "adtc_shaped": {
+        "S_acc": 17.0,
+        "S_tps": 20.8,
+        "S_mem": 73.52455357142857,
+        "total": 29.444910714285715,
+        "formula": "0.5*S_acc + 0.3*S_tps + 0.2*S_mem"
+      },
+      "systems": {
+        "tps": 3.12,
+        "peak_rss_mb": 1897.76
+      },
+      "frozen_suite_accs": {
+        "afrimgsm_amh": 0.0,
+        "afrimgsm_eng": 0.34,
+        "afrimmlu_amh": 0.0,
+        "en_stem_holdout": 0.34
+      },
+      "perf_json": "docs/artifacts/perf/qwen3_1_7b_merged_v0-Q4_K_M_v0.json"
+    },
+    {
+      "rank": 2,
+      "model_key": "gemma3_4b_merged_v0-Q4_K_M",
+      "gguf_path": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/gemma3_4b_merged_v0-Q4_K_M.gguf",
+      "adtc_shaped": {
+        "S_acc": 26.5,
+        "S_tps": 14.2,
+        "S_mem": 42.230050223214285,
+        "total": 25.956010044642856,
+        "formula": "0.5*S_acc + 0.3*S_tps + 0.2*S_mem"
+      },
+      "systems": {
+        "tps": 2.13,
+        "peak_rss_mb": 4140.95
+      },
+      "frozen_suite_accs": {
+        "afrimgsm_amh": 0.12,
+        "afrimgsm_eng": 0.34,
+        "afrimmlu_amh": 0.26,
+        "en_stem_holdout": 0.34
+      },
+      "perf_json": "docs/artifacts/perf/gemma3_4b_merged_v0-Q4_K_M_v0.json"
+    },
+    {
+      "rank": 3,
+      "model_key": "qwen3_4b_merged_v0-Q4_K_M",
+      "gguf_path": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/qwen3_4b_merged_v0-Q4_K_M.gguf",
+      "adtc_shaped": {
+        "S_acc": 18.0,
+        "S_tps": 14.733333333333334,
+        "S_mem": 40.10030691964287,
+        "total": 21.440061383928573,
+        "formula": "0.5*S_acc + 0.3*S_tps + 0.2*S_mem"
+      },
+      "systems": {
+        "tps": 2.21,
+        "peak_rss_mb": 4293.61
+      },
+      "frozen_suite_accs": {
+        "afrimgsm_amh": 0.08,
+        "afrimgsm_eng": 0.32,
+        "afrimmlu_amh": 0.0,
+        "en_stem_holdout": 0.32
+      },
+      "perf_json": "docs/artifacts/perf/qwen3_4b_merged_v0-Q4_K_M_v0.json"
+    }
+  ],
+  "recommended_submission": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/qwen3_1_7b_merged_v0-Q4_K_M.gguf"
+}

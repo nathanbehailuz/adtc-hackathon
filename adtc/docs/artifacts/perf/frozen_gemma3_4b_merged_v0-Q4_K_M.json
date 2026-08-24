@@ -1,0 +1,45 @@
+{
+  "gguf": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/gemma3_4b_merged_v0-Q4_K_M.gguf",
+  "limit": 50,
+  "frozen_suites": {
+    "afrimgsm_amh": {
+      "n": 50,
+      "correct": 6,
+      "acc": 0.12
+    },
+    "afrimgsm_eng": {
+      "n": 50,
+      "correct": 17,
+      "acc": 0.34
+    },
+    "afrimmlu_amh": {
+      "n": 50,
+      "correct": 13,
+      "acc": 0.26
+    },
+    "en_stem_holdout": {
+      "n": 50,
+      "correct": 17,
+      "acc": 0.34
+    },
+    "custom_tutoring": {
+      "n": 20,
+      "correct": 17,
+      "acc": 0.85,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "The tank holds 120 liters.\nIt is 3/5 full, so it has 120 * 3/5 = 72 liters.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "When you multiply both sides of an equation by the same non-zero number, you are essentially performing the same operation on both sides of the equation. This maintains the balance of the equation, en"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "Focus on the operation you need to undo first, and write that operation on the left side of the equation before you undo it."
+        }
+      ]
+    }
+  }
+}

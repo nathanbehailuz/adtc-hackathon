@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Direct-Amharic vs English translate-test on frozen AfriMGSM pairs."""
+"""Direct-Amharic vs English translate-test on frozen AfriMGSM pairs.
+
+Supports HF checkpoints (--model) or local GGUF (--gguf) via llama-cpp-python.
+"""
 from __future__ import annotations
 
 import argparse
@@ -27,7 +30,6 @@ def normalize_ans(s: str) -> str:
     if "</think>" in s:
         s = s.split("</think>")[-1]
     s = s.strip().lower().replace(",", "")
-    # take last number-like token
     nums = re.findall(r"-?\d+(?:\.\d+)?", s)
     if nums:
         return nums[-1]
@@ -43,7 +45,7 @@ def load_jsonl(path: Path) -> list[dict]:
     return rows
 
 
-def generate(model, tok, prompt: str, max_new: int = 64) -> str:
+def generate_hf(model, tok, prompt: str, max_new: int = 64) -> str:
     import torch
 
     messages = [{"role": "user", "content": prompt}]
@@ -59,32 +61,74 @@ def generate(model, tok, prompt: str, max_new: int = 64) -> str:
     return tok.decode(gen, skip_special_tokens=True)
 
 
+def generate_gguf(llm, prompt: str, max_new: int = 64) -> str:
+    try:
+        out = llm.create_chat_completion(
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=max_new,
+            temperature=0.0,
+        )
+        return out["choices"][0]["message"]["content"] or ""
+    except Exception:  # noqa: BLE001
+        out = llm(prompt, max_tokens=max_new, temperature=0.0, echo=False)
+        return out["choices"][0]["text"] or ""
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--model", required=True, help="HF model id or local merged path")
+    ap.add_argument("--model", default=None, help="HF model id or local merged path")
+    ap.add_argument("--gguf", type=Path, default=None, help="Local GGUF path (llama-cpp)")
     ap.add_argument("--am", type=Path, default=ROOT / "data/eval/afrimgsm_amh_test_v0.jsonl")
     ap.add_argument("--en", type=Path, default=ROOT / "data/eval/afrimgsm_eng_test_v0.jsonl")
-    ap.add_argument("--limit", type=int, default=50)
+    ap.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Cap aligned AfriMGSM pairs (default: all)",
+    )
+    ap.add_argument("--n-threads", type=int, default=None)
     ap.add_argument("--out", type=Path, default=ROOT / "docs/artifacts/phase2_translate_test_v0.md")
     args = ap.parse_args()
 
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    if bool(args.model) == bool(args.gguf):
+        raise SystemExit("Provide exactly one of --model or --gguf")
 
-    am_rows = load_jsonl(args.am)[: args.limit]
-    en_rows = load_jsonl(args.en)[: args.limit]
-    # align by index (same suite order)
-    n = min(len(am_rows), len(en_rows), args.limit)
+    am_rows = load_jsonl(args.am)
+    en_rows = load_jsonl(args.en)
+    n = min(len(am_rows), len(en_rows))
+    if args.limit is not None:
+        n = min(n, args.limit)
+    am_rows = am_rows[:n]
+    en_rows = en_rows[:n]
 
-    tok = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model,
-        torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
-        device_map="auto" if torch.cuda.is_available() else None,
-        trust_remote_code=True,
-    )
-    if not torch.cuda.is_available():
-        model = model.to("cpu")
+    label: str
+    if args.gguf:
+        from llama_cpp import Llama
+
+        gguf = args.gguf.resolve()
+        if not gguf.is_file():
+            raise SystemExit(f"GGUF not found: {gguf}")
+        kwargs = {"model_path": str(gguf), "n_ctx": 2048, "verbose": False}
+        if args.n_threads is not None:
+            kwargs["n_threads"] = args.n_threads
+        llm = Llama(**kwargs)
+        label = str(gguf)
+        generate_fn = lambda p: generate_gguf(llm, p)
+    else:
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+
+        tok = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model,
+            torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
+            device_map="auto" if torch.cuda.is_available() else None,
+            trust_remote_code=True,
+        )
+        if not torch.cuda.is_available():
+            model = model.to("cpu")
+        label = args.model
+        generate_fn = lambda p: generate_hf(model, tok, p)
 
     direct_ok = 0
     translate_ok = 0
@@ -93,11 +137,8 @@ def main() -> None:
         am = am_rows[i]
         en = en_rows[i]
         gold = normalize_ans(gold_answer(am) or gold_answer(en))
-        am_prompt = am["question"]
-        # translate-test: English question (same item), model answers in EN
-        en_prompt = en["question"]
-        am_pred = normalize_ans(generate(model, tok, am_prompt))
-        en_pred = normalize_ans(generate(model, tok, en_prompt))
+        am_pred = normalize_ans(generate_fn(am["question"]))
+        en_pred = normalize_ans(generate_fn(en["question"]))
         d_hit = bool(gold) and am_pred == gold
         t_hit = bool(gold) and en_pred == gold
         direct_ok += int(d_hit)
@@ -119,39 +160,26 @@ def main() -> None:
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     md = [
-        "# Phase 2 — Direct Amharic vs English translate-test",
+        "# Direct Amharic vs English translate-test",
         "",
-        f"- Model: `{args.model}`",
+        f"- Model: `{label}`",
         f"- N: {n} (AfriMGSM amh vs eng, index-aligned)",
         f"- Direct Amharic accuracy: **{direct_acc:.3f}** ({direct_ok}/{n})",
         f"- English translate-test accuracy: **{translate_acc:.3f}** ({translate_ok}/{n})",
         f"- Gap (translate − direct): **{gap:+.3f}**",
         "",
-        "| i | gold | direct_am | translate_en | direct_ok | translate_ok |",
-        "|---|------|-----------|--------------|-----------|--------------|",
     ]
-    for r in rows_out[:20]:
-        md.append(
-            f"| {r['i']} | {r['gold']} | {r['direct_am_pred']} | {r['translate_en_pred']} | {r['direct_ok']} | {r['translate_ok']} |"
-        )
-    md.append("")
     args.out.write_text("\n".join(md) + "\n", encoding="utf-8")
-    json_path = args.out.with_suffix(".json")
-    json_path.write_text(
-        json.dumps(
-            {
-                "model": args.model,
-                "n": n,
-                "direct_acc": direct_acc,
-                "translate_acc": translate_acc,
-                "gap": gap,
-                "rows": rows_out,
-            },
-            indent=2,
-            ensure_ascii=False,
-        )
-        + "\n",
-        encoding="utf-8",
+    payload = {
+        "model": label,
+        "n": n,
+        "direct_acc": direct_acc,
+        "translate_acc": translate_acc,
+        "gap": gap,
+        "rows": rows_out,
+    }
+    args.out.with_suffix(".json").write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
     print(json.dumps({"direct_acc": direct_acc, "translate_acc": translate_acc, "gap": gap, "n": n}, indent=2))
     print(f"wrote {args.out}")

@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "model_key": "gemma3_4b_merged_v0-Q4_K_M",
+  "gguf_path": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/gemma3_4b_merged_v0-Q4_K_M.gguf",
+  "measured_on": "jubail_hpc",
+  "systems": {
+    "tps": 2.13,
+    "ttft_ms": 10456.15,
+    "peak_rss_mb": 4140.95,
+    "steady_rss_mb": 3958.43,
+    "throttled": false,
+    "core_temp_c_peak": 65.5,
+    "profiler_artifact": "docs/artifacts/perf/profiler_gemma3_4b_merged_v0-Q4_K_M.json"
+  },
+  "profiler_accuracy": {
+    "task": "arc_easy",
+    "limit": 50,
+    "items": [
+      {
+        "benchmark": "arc_easy",
+        "dataset_version": "lm-eval-harness",
+        "language": "en",
+        "samples": 50,
+        "score": 0.78,
+        "metric": "acc_norm"
+      }
+    ],
+    "mean": 0.78
+  },
+  "frozen_suites": {
+    "afrimgsm_amh": {
+      "n": 50,
+      "correct": 6,
+      "acc": 0.12
+    },
+    "afrimgsm_eng": {
+      "n": 50,
+      "correct": 17,
+      "acc": 0.34
+    },
+    "afrimmlu_amh": {
+      "n": 50,
+      "correct": 13,
+      "acc": 0.26
+    },
+    "en_stem_holdout": {
+      "n": 50,
+      "correct": 17,
+      "acc": 0.34
+    },
+    "custom_tutoring": {
+      "n": 20,
+      "correct": 17,
+      "acc": 0.85,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "The tank holds 120 liters.\nIt is 3/5 full, so it has 120 * 3/5 = 72 liters.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "When you multiply both sides of an equation by the same non-zero number, you are essentially performing the same operation on both sides of the equation. This maintains the balance of the equation, en"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "Focus on the operation you need to undo first, and write that operation on the left side of the equation before you undo it."
+        }
+      ]
+    }
+  },
+  "translate_test": {
+    "direct_acc": 0.08,
+    "translate_acc": 0.2,
+    "gap": 0.12000000000000001,
+    "n": 50
+  },
+  "sustained": {
+    "ok": true,
+    "notes": ""
+  },
+  "adtc_shaped": {
+    "S_acc": 26.5,
+    "S_tps": 14.2,
+    "S_mem": 42.230050223214285,
+    "total": 25.956010044642856,
+    "formula": "0.5*S_acc + 0.3*S_tps + 0.2*S_mem"
+  },
+  "human_amharic_review": {
+    "status": "pending",
+    "n_samples": 0,
+    "notes": ""
+  }
+}

@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH -c 8
 #SBATCH --mem=64G
-#SBATCH -t 4:00:00
+#SBATCH -t 12:00:00
 #SBATCH -o logs/%x-%j.out
 #SBATCH -e logs/%x-%j.err
 
@@ -16,10 +16,14 @@ source "${HPC_DIR}/env.sh"
 cd "${ADTC_ROOT}"
 
 MODEL="${MODEL:-Qwen/Qwen3-1.7B}"
+LIMIT_ARGS=()
+if [[ -n "${LIMIT:-}" ]]; then
+  LIMIT_ARGS+=(--limit "${LIMIT}")
+fi
 # Prefer local merged if present for post-adapt; Phase 2 default is base.
 python eval/run_translate_test.py \
   --model "${MODEL}" \
-  --limit "${LIMIT:-50}" \
+  "${LIMIT_ARGS[@]}" \
   --out docs/artifacts/phase2_translate_test_v0.md
 
 echo "[translate_test] Done"

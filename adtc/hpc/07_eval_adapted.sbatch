@@ -4,18 +4,21 @@
 #SBATCH --gres=gpu:1
 #SBATCH -c 8
 #SBATCH --mem=64G
-#SBATCH -t 12:00:00
+#SBATCH -t 24:00:00
 #SBATCH -o logs/%x-%j.out
 #SBATCH -e logs/%x-%j.err
 
-# Evaluate all four merged HF models on frozen suites.
+# Evaluate all four merged HF models on frozen suites (full sets unless LIMIT= is set).
 set -euo pipefail
 HPC_DIR="${SLURM_SUBMIT_DIR:?SLURM_SUBMIT_DIR unset; sbatch from adtc/hpc/}"
 # shellcheck disable=SC1091
 source "${HPC_DIR}/env.sh"
 cd "${ADTC_ROOT}"
 
-LIMIT="${LIMIT:-50}"
+LIMIT_ARGS=()
+if [[ -n "${LIMIT:-}" ]]; then
+  LIMIT_ARGS+=(--limit "${LIMIT}")
+fi
 OUT_DIR="${ADTC_ROOT}/docs/artifacts"
 mkdir -p "${OUT_DIR}"
 
@@ -31,7 +34,7 @@ for m in "${MODELS[@]}"; do
   name="$(basename "${m}")"
   out="${OUT_DIR}/phase4_eval_${name}.json"
   echo "======== EVAL ${m} ========"
-  if python eval/run_hf_eval.py --model "${m}" --limit "${LIMIT}" --out "${out}"; then
+  if python eval/run_hf_eval.py --model "${m}" "${LIMIT_ARGS[@]}" --out "${out}"; then
     echo "[eval] OK ${out}"
   else
     echo "[eval] FAIL ${m}" >&2
