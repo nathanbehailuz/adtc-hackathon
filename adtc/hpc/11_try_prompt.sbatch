@@ -13,17 +13,22 @@
 #   1–8  GGUF via llama_cpp  → default: compute (CPU)
 #   9    AfriqueQwen3.5-ExtCM v5 HF (qwen35_extcm_merged_v5)
 #        → needs nvidia A100 (llama_cpp cannot load arch=qwen35)
+#  10    Qwen3-1.7B v6 Q4 GGUF (English-only / profiler) → compute
 #
 # From adtc/hpc/:
-#   # Gemma v4 GGUF (default)
+#   # Gemma v4 GGUF (default) — English prompts only (1–5)
 #   sbatch 11_try_prompt.sbatch
-#   MODEL=8 PROMPTS=all sbatch 11_try_prompt.sbatch
+#   MODEL=8 PROMPTS=all sbatch 11_try_prompt.sbatch   # same as 1,2,3,4,5
 #
-#   # v5 HF on GPU (auto-requests nvidia if MODEL=9)
-#   MODEL=9 PROMPTS=all sbatch 11_try_prompt.sbatch
-#   MODEL=9 PROMPT=6 sbatch 11_try_prompt.sbatch
-#   MODEL=9 PROMPT=11 TEXT='Solve 2+2' sbatch 11_try_prompt.sbatch
+#   # v6 English Qwen GGUF
+#   MODEL=10 PROMPTS=all sbatch 11_try_prompt.sbatch
 #
+#   # v5 HF on GPU
+#   MODEL=9 PROMPTS=all sbatch -p nvidia --gres=gpu:a100:1 --mem=64G -t 4:00:00 11_try_prompt.sbatch
+#   MODEL=9 PROMPT=1 sbatch -p nvidia --gres=gpu:a100:1 --mem=64G 11_try_prompt.sbatch
+#   MODEL=9 PROMPT=11 TEXT='Solve 2+2' sbatch -p nvidia --gres=gpu:a100:1 --mem=64G 11_try_prompt.sbatch
+#
+# English prompts: 1–5. Amharic / code-switch (6–10) are not run by this job.
 # Logs:
 #   adtc/hpc/logs/adtc_try_prompt-<jobid>.{out,err}
 #   adtc/logs/try_prompt/<jobid>_m<model>.log
@@ -39,10 +44,36 @@ export OPENBLAS_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
 export PYTHONUNBUFFERED=1
 
 MODEL="${MODEL:-8}"
-PROMPT="${PROMPT:-6}"
+PROMPT="${PROMPT:-}"
 PROMPTS="${PROMPTS:-}"
 TEXT="${TEXT:-}"
 MAX_TOKENS="${MAX_TOKENS:-256}"
+
+# English-only suite (try_prompt.py indices 1–5). Amharic/code-switch = 6–10.
+EN_PROMPTS="1,2,3,4,5"
+if [[ "${PROMPTS}" == "all" || ( -z "${PROMPTS}" && -z "${PROMPT}" && -z "${TEXT}" ) ]]; then
+  PROMPTS="${EN_PROMPTS}"
+fi
+# Reject Amharic / code-switch indices unless INCLUDE_AM=1
+if [[ "${INCLUDE_AM:-0}" != "1" ]]; then
+  case ",${PROMPTS}," in
+    *,6,*|*,7,*|*,8,*|*,9,*|*,10,*)
+      echo "[try_prompt] ERROR: Amharic/code-switch prompts (6–10) disabled in 11_try_prompt.sbatch." >&2
+      echo "[try_prompt] Use English 1–5, or set INCLUDE_AM=1 to override." >&2
+      exit 1
+      ;;
+  esac
+  if [[ -z "${TEXT}" && -n "${PROMPT}" ]]; then
+    case "${PROMPT}" in
+      6|7|8|9|10)
+        echo "[try_prompt] ERROR: Amharic/code-switch prompt ${PROMPT} disabled. Use 1–5 or INCLUDE_AM=1." >&2
+        exit 1
+        ;;
+    esac
+  fi
+fi
+# Single-prompt default when neither PROMPTS nor PROMPT set after mapping: already set PROMPTS.
+# If only PROMPT is set, leave PROMPTS empty so --prompt is used.
 
 # Model 9 is HF-only (qwen35 GGUF unsupported by current llama_cpp).
 # If submitted on compute without a GPU, fail fast with a clear message.

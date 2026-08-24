@@ -22,6 +22,17 @@ sbatch setup_env.sbatch
 
 Always `cd` into `adtc/hpc` before `sbatch`. Jobs resolve paths via `SLURM_SUBMIT_DIR` (Slurm’s spool copy of the script is not writable).
 
+### v6 English-only Qwen3-1.7B (profiler track)
+
+```bash
+cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+bash submit_v6_chain.sh   # prep → SFT → merge → GGUF → HF/GGUF eval → profile
+# try_prompt after GGUF exists:
+MODEL=10 PROMPTS=all sbatch 11_try_prompt.sbatch
+```
+
+Artifacts: `adtc/docs/artifacts/v6/`. See [`docs/artifacts/v6/MILESTONE_REPORT.md`](../docs/artifacts/v6/MILESTONE_REPORT.md).
+
 That submits (with `afterok` dependencies):
 
 1. `setup_env.sbatch` — scratch conda env + CUDA torch + `training/requirements.txt`
