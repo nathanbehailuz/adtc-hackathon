@@ -1,0 +1,16 @@
+{
+  "n": 20000,
+  "source": {
+    "fineweb2_amh": 7816,
+    "wikipedia_amharic": 3184,
+    "en_stem_sft_v2": 4000,
+    "afrinllb": 5000
+  },
+  "targets": {
+    "native": 7000,
+    "parallel": 5000,
+    "en_stem": 4000,
+    "replay": 2000,
+    "fill": 2000
+  }
+}
