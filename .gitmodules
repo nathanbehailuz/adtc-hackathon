@@ -1,0 +1,3 @@
+[submodule "adtc-2026-submission-template"]
+	path = adtc-2026-submission-template
+	url = https://github.com/nathanbehailuz/adtc-2026-submission-template.git
