@@ -1,0 +1,14 @@
+{
+  "files": [
+    "gemma3_4b_merged_v2-Q4_K_M.gguf",
+    "gemma3_4b_merged_v2-Q5_K_M.gguf",
+    "gemma3_4b_merged_v2-Q6_K.gguf",
+    "gemma3_4b_merged_v2-Q8_0.gguf",
+    "gemma3_4b_merged_v2-f16.gguf",
+    "qwen3_1_7b_merged_v2-Q4_K_M.gguf",
+    "qwen3_1_7b_merged_v2-Q5_K_M.gguf",
+    "qwen3_1_7b_merged_v2-Q6_K.gguf",
+    "qwen3_1_7b_merged_v2-Q8_0.gguf",
+    "qwen3_1_7b_merged_v2-f16.gguf"
+  ]
+}

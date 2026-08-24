@@ -91,6 +91,15 @@ FIRST_EXPERIMENT = [
         "limit": None,
     },
     {
+        # Fallback Amharic GSM8K (Seamless MT) if AfriqueLLM Hub id flakes.
+        "key": "simonbutt_amharic_gsm8k",
+        "hf_id": "simonbutt/amharic_gsm8k",
+        "config": None,
+        "split": "train",
+        "role": "sft",
+        "limit": None,
+    },
+    {
         "key": "r1_multilingual",
         "hf_id": "lightblue/reasoning-multilingual-R1-Llama-70B-train",
         "config": None,
@@ -132,48 +141,119 @@ def _jsonable(obj):
     return str(obj)
 
 
-def _try_load(hf_id: str, config: str | None, split: str, streaming: bool):
+def _hf_token() -> str | None:
+    import os
+
+    return os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN") or None
+
+
+def _try_load(hf_id: str, config: str | None, split: str, streaming: bool, *, data_dir: str | None = None):
     from datasets import load_dataset
 
-    kwargs = {"path": hf_id, "split": split, "cache_dir": str(RAW), "streaming": streaming}
+    kwargs: dict = {"split": split, "cache_dir": str(RAW), "streaming": streaming}
+    token = _hf_token()
+    if token:
+        kwargs["token"] = token
+    if data_dir:
+        kwargs["path"] = data_dir
+    else:
+        kwargs["path"] = hf_id
     if config:
         kwargs["name"] = config
     return load_dataset(**kwargs)
 
 
+def _snapshot_local(hf_id: str) -> Path:
+    """Download repo files via huggingface_hub (more reliable than datasets alone)."""
+    from huggingface_hub import snapshot_download
+
+    dest = ROOT / "data" / "raw" / "hub_snapshots" / hf_id.replace("/", "__")
+    dest.mkdir(parents=True, exist_ok=True)
+    kwargs: dict = {
+        "repo_id": hf_id,
+        "repo_type": "dataset",
+        "local_dir": str(dest),
+    }
+    token = _hf_token()
+    if token:
+        kwargs["token"] = token
+    try:
+        snapshot_download(**kwargs, local_dir_use_symlinks=False)
+    except TypeError:
+        snapshot_download(**kwargs)
+    return dest
+
+
 def load_rows(spec: dict) -> tuple[list[dict], str]:
-    """Return (rows, mode). Tries train then common alternate splits."""
+    """Return (rows, mode). Tries train then common alternate splits.
+
+    Falls back to ``snapshot_download`` → local ``load_dataset`` when Hub id
+    fails via datasets alone (seen with AfriqueLLM coldstart).
+    """
     splits = [spec.get("split") or "train", "train", "validation", "test", "dev"]
     # unique preserve order
     seen = set()
     splits = [s for s in splits if not (s in seen or seen.add(s))]
     last_err: Exception | None = None
+    data_dirs: list[str | None] = [None]
 
-    for split in splits:
-        # capped: prefer streaming
-        if spec.get("limit"):
-            try:
-                ds = _try_load(spec["hf_id"], spec.get("config"), split, streaming=True)
+    def _collect(split: str, streaming: bool, data_dir: str | None) -> tuple[list[dict], str] | None:
+        nonlocal last_err
+        try:
+            ds = _try_load(
+                spec["hf_id"], spec.get("config"), split, streaming, data_dir=data_dir
+            )
+            if streaming:
                 rows = []
+                lim = spec.get("limit")
                 for i, ex in enumerate(ds):
-                    if i >= spec["limit"]:
+                    if lim is not None and i >= lim:
                         break
                     rows.append(_jsonable(dict(ex)))
                 if rows:
-                    return rows, f"streaming:{split}"
-            except Exception as e:  # noqa: BLE001
-                last_err = e
-        try:
-            ds = _try_load(spec["hf_id"], spec.get("config"), split, streaming=False)
-            if spec.get("limit"):
-                n = min(spec["limit"], len(ds))
-                ds = ds.select(range(n))
-            rows = [_jsonable(dict(ds[i])) for i in range(len(ds))]
-            if rows:
-                return rows, f"map:{split}"
+                    tag = f"streaming:{split}"
+                    if data_dir:
+                        tag = f"snap+{tag}"
+                    return rows, tag
+            else:
+                if spec.get("limit"):
+                    n = min(spec["limit"], len(ds))
+                    ds = ds.select(range(n))
+                rows = [_jsonable(dict(ds[i])) for i in range(len(ds))]
+                if rows:
+                    tag = f"map:{split}"
+                    if data_dir:
+                        tag = f"snap+{tag}"
+                    return rows, tag
         except Exception as e:  # noqa: BLE001
             last_err = e
-            continue
+        return None
+
+    for split in splits:
+        if spec.get("limit"):
+            got = _collect(split, streaming=True, data_dir=None)
+            if got:
+                return got
+        got = _collect(split, streaming=False, data_dir=None)
+        if got:
+            return got
+
+    # AfriqueLLM / flaky Hub: snapshot then load from local dir
+    try:
+        local = _snapshot_local(spec["hf_id"])
+        data_dirs.append(str(local))
+    except Exception as e:  # noqa: BLE001
+        last_err = e
+
+    for data_dir in data_dirs[1:]:
+        for split in splits:
+            if spec.get("limit"):
+                got = _collect(split, streaming=True, data_dir=data_dir)
+                if got:
+                    return got
+            got = _collect(split, streaming=False, data_dir=data_dir)
+            if got:
+                return got
 
     raise RuntimeError(f"failed to load {spec['hf_id']}: {last_err}")
 

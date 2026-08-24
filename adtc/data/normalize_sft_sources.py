@@ -37,10 +37,15 @@ SNAPSHOT_KEY = {
     "walia": "walia",
     "finetome": "finetome_am",
     "afriquellm_gsm8k": "afriquellm_gsm8k",
+    "simonbutt_amharic_gsm8k": "simonbutt_amharic_gsm8k",
     "r1": "r1_multilingual",
     "dolly": "dolly_am",
     "taco": "taco_am",
 }
+
+AM_LANG_TAGS = frozenset(
+    {"am", "amh", "amharic", "amh_ethi", "amh_ethiopic", "am-et", "am_et"}
+)
 
 
 def emit(row_id: str, direction: str, behavior: str, user: str, assistant: str, source: str) -> dict:
@@ -59,6 +64,27 @@ def emit(row_id: str, direction: str, behavior: str, user: str, assistant: str, 
 def looks_amharic(text: str) -> bool:
     # Ethiopic block
     return bool(re.search(r"[\u1200-\u137F]", text or ""))
+
+
+def ethiopic_both(user: str, assistant: str) -> bool:
+    return looks_amharic(user) and looks_amharic(assistant)
+
+
+def lang_is_amharic(ex: dict) -> bool:
+    candidates: list = []
+    for key in ("language", "lang", "lang_code", "tgt_lang", "src_lang"):
+        if ex.get(key) is not None:
+            candidates.append(ex.get(key))
+    meta = ex.get("meta")
+    if isinstance(meta, dict):
+        for key in ("language", "lang", "lang_code", "tgt_lang", "id"):
+            if meta.get(key) is not None:
+                candidates.append(meta.get(key))
+    for val in candidates:
+        tag = str(val).strip().lower().replace("-", "_")
+        if tag in AM_LANG_TAGS or tag.startswith("amh"):
+            return True
+    return False
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -163,13 +189,6 @@ def normalize_afriquellm_gsm8k(limit: int | None) -> Path:
     rows = []
     for i, ex in enumerate(ds):
         ex = dict(ex)
-        # Heuristic: keep Amharic-looking fields
-        text_blob = json.dumps(ex, ensure_ascii=False)
-        if not looks_amharic(text_blob):
-            # also accept explicit lang tags
-            lang = str(ex.get("language") or ex.get("lang") or "").lower()
-            if lang not in ("am", "amh", "amharic"):
-                continue
         pair = from_instruction_fields(ex)
         if not pair:
             q = ex.get("question") or ex.get("problem") or ""
@@ -179,10 +198,38 @@ def normalize_afriquellm_gsm8k(limit: int | None) -> Path:
         if not pair:
             continue
         u, a = pair
+        # Keep Amharic only (dataset is 11 languages).
+        if not (looks_amharic(u) or looks_amharic(a) or lang_is_amharic(ex)):
+            continue
+        if not looks_amharic(u):
+            continue
         rows.append(emit(f"afriquellm_gsm8k_am_{i:06d}", "am_am", "solve", u, a, "afriquellm_gsm8k_am"))
     out = OUT_DIR / "afriquellm_gsm8k_am_sft_v0.jsonl"
     write_jsonl(out, rows)
     print(f"afriquellm_gsm8k_am -> {out} ({len(rows)})")
+    return out
+
+
+def normalize_simonbutt_gsm8k(limit: int | None) -> Path:
+    ds = iter_examples("simonbutt_amharic_gsm8k", "simonbutt/amharic_gsm8k", limit=limit)
+    rows = []
+    for i, ex in enumerate(ds):
+        ex = dict(ex)
+        u = str(ex.get("am_question") or "").strip()
+        a = str(ex.get("am_answer") or "").strip()
+        if not u or not a:
+            pair = from_instruction_fields(ex)
+            if not pair:
+                continue
+            u, a = pair
+        if not looks_amharic(u):
+            continue
+        rows.append(
+            emit(f"simonbutt_gsm8k_am_{i:06d}", "am_am", "solve", u, a, "simonbutt_amharic_gsm8k")
+        )
+    out = OUT_DIR / "simonbutt_amharic_gsm8k_sft_v0.jsonl"
+    write_jsonl(out, rows)
+    print(f"simonbutt_amharic_gsm8k -> {out} ({len(rows)})")
     return out
 
 
@@ -265,7 +312,7 @@ def main() -> None:
     parser.add_argument(
         "--sources",
         nargs="*",
-        default=["walia", "finetome", "afriquellm_gsm8k", "r1", "dolly", "taco"],
+        default=["walia", "finetome", "afriquellm_gsm8k", "simonbutt_amharic_gsm8k", "r1", "dolly", "taco"],
     )
     parser.add_argument("--skip-dedup", action="store_true")
     args = parser.parse_args()
@@ -275,6 +322,7 @@ def main() -> None:
         "walia": normalize_walia,
         "finetome": normalize_finetome,
         "afriquellm_gsm8k": normalize_afriquellm_gsm8k,
+        "simonbutt_amharic_gsm8k": normalize_simonbutt_gsm8k,
         "r1": normalize_r1,
         "dolly": normalize_dolly,
         "taco": normalize_taco,
@@ -293,7 +341,7 @@ def main() -> None:
             try:
                 key = SNAPSHOT_KEY.get(name, name)
                 snap = SNAPSHOTS / f"{key}.jsonl"
-                if not snap.exists() and name == "afriquellm_gsm8k":
+                if not snap.exists() and name in ("afriquellm_gsm8k", "simonbutt_amharic_gsm8k"):
                     log.item_skip(name, "no snapshot; download failed or missing on Hub")
                     continue
                 path = fn(args.limit)

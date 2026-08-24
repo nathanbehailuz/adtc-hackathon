@@ -1,0 +1,49 @@
+{
+  "model": "training/runs/gemma3_4b_merged_v2",
+  "limit": null,
+  "suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 51,
+      "acc": 0.204
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 82,
+      "acc": 0.328
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 109,
+      "acc": 0.218
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 32,
+      "acc": 0.32
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 89,
+      "acc": 0.8811881188118812,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "The tank holds 120 * 3/5 = <<120*3/5=72>>72 liters.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "If a = b, then a*c = b*c.\nThis is because a*c is the same quantity as b*c.\nFor example, if a = 2 and b = 4, then a*c = 2*c = 2c and b*c = 4*c = 4c.\nSince 2c = 4c, then c = 2.\n#### 2"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "Hint: start by computing (19-7). Write the answer, then continue — do not jump to the final total yet."
+        }
+      ]
+    }
+  },
+  "forget_proxy": {
+    "en_stem_acc": 0.32,
+    "am_mgsm_acc": 0.204
+  }
+}

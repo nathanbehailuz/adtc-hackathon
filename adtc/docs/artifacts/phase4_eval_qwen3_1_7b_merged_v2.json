@@ -1,0 +1,49 @@
+{
+  "model": "training/runs/qwen3_1_7b_merged_v2",
+  "limit": null,
+  "suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 9,
+      "acc": 0.036
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 89,
+      "acc": 0.356
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 0,
+      "acc": 0.0
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 34,
+      "acc": 0.34
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 101,
+      "acc": 1.0,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "<think>\n\n</think>\n\nThe tank is 3/5 * 120 = <<3/5*120=72>>72 liters full.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "<think>\n\n</think>\n\nIf we multiply both sides of an equation by the same non-zero number, the equality remains true because we are not changing the relationship between the two sides of the equation.\n<"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "<think>\n\n</think>\n\nHint: start by applying one operation to both sides of the equation."
+        }
+      ]
+    }
+  },
+  "forget_proxy": {
+    "en_stem_acc": 0.34,
+    "am_mgsm_acc": 0.036
+  }
+}
