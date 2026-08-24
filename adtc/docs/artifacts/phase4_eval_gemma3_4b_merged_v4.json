@@ -1,0 +1,49 @@
+{
+  "model": "training/runs/gemma3_4b_merged_v4",
+  "limit": null,
+  "suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 54,
+      "acc": 0.216
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 88,
+      "acc": 0.352
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 107,
+      "acc": 0.214
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 38,
+      "acc": 0.38
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 93,
+      "acc": 0.9207920792079208,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "120 x 3/5 = <<120*3/5=72>>72 liters\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "Multiplying both sides of an equation by the same non-zero number keeps the equality true because it's like applying the same operation to both sides of a balanced scale. If you add the same weight to"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "Hint: start by computing (19-7). Write that intermediate result, then continue — do not jump to the final answer yet."
+        }
+      ]
+    }
+  },
+  "forget_proxy": {
+    "en_stem_acc": 0.38,
+    "am_mgsm_acc": 0.216
+  }
+}

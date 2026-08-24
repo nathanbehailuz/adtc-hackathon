@@ -1,0 +1,10 @@
+[
+  {
+    "model": "training/runs/gemma3_4b_merged_v4",
+    "afrimgsm_amh": 0.216,
+    "afrimgsm_eng": 0.352,
+    "afrimmlu_amh": 0.214,
+    "en_stem_holdout": 0.38,
+    "custom_tutoring": 0.9207920792079208
+  }
+]

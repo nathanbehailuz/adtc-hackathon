@@ -1,0 +1,45 @@
+{
+  "gguf": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/gemma3_4b_merged_v4-Q4_K_M.gguf",
+  "limit": null,
+  "frozen_suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 54,
+      "acc": 0.216
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 89,
+      "acc": 0.356
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 106,
+      "acc": 0.212
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 37,
+      "acc": 0.37
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 93,
+      "acc": 0.9207920792079208,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "120 x 3/5 = <<120*3/5=72>>72 liters\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "Multiplying both sides of an equation by the same non-zero number preserves the equality because it is a fundamental property of equality.\n#### 0"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "Hint: start by adding 7 to both sides, then divide by 2. Do not state x yet."
+        }
+      ]
+    }
+  }
+}
