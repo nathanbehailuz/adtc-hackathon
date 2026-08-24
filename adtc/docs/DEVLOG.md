@@ -785,3 +785,100 @@ Committed the long uncommitted backlog (since `installed llama.cpp`) as seven fo
 ### Next
 1. Optional: `git push origin main` when ready.
 2. Continue try_prompt MODEL=9 qualitative check vs Gemma v4.
+
+---
+
+## 2026-08-24 — ADTC v6 English-only Qwen3-1.7B scaffold
+
+### Outcome
+Scaffolded non-destructive **v6** track: English-only SFT on `Qwen/Qwen3-1.7B` (no Afrique / Amharic CPT), mix built (**10473** rows), train→GGUF→eval→profiler chain scripts ready. **Did not launch train.**
+
+### What
+- Mix: `data/mix_sft_v6.py` → `data/train/sft_mix_v6.jsonl` (GSM8K 7473 + SciQ 3000; dedup 0)
+- Config / HPC: `qlora_qwen3_1_7b_v6.yaml`, `02h`/`04g`/`05f`/`08h`/`12i`/`12j`/`09b`, `submit_v6_chain.sh`
+- Thinking off for scoring: HF `enable_thinking=False`; GGUF `/no_think`
+- `try_prompt` model **10** = `qwen3_1_7b_merged_v6-Q4_K_M.gguf`
+- Report: [`docs/artifacts/v6/MILESTONE_REPORT.md`](./artifacts/v6/MILESTONE_REPORT.md)
+
+### Next
+1. `cd adtc/hpc && bash submit_v6_chain.sh`
+2. Review `docs/artifacts/v6/*` vs v0 Qwen Q4 Gate 5 baseline.
+3. Pick Q4/Q5/Q6 via `phase5_gate5_winner_v6.json`.
+
+---
+
+## 2026-08-25 — Submission cleanup: v6 English-only only
+
+### Outcome
+Stripped the repo to the **v6 English-only** pipeline for Gate 1 submission. Removed v0–v5 Amharic/Afrique/multilingual experiment code, Slurm chains, configs, docs artifacts, and ~365G of obsolete checkpoints/GGUFs/HF caches. Repo `adtc/` now ~23G (v6 runs + GGUF quants + Qwen3-1.7B base cache).
+
+### What
+- **Kept:** `submit_v6_chain.sh`, v6 sbatch scripts, `mix_sft_v6.py`, `qlora_qwen3_1_7b_v6.yaml`, eval harness, `docs/artifacts/v6/`
+- **Deleted:** ~50 legacy Slurm scripts, v0–v5 data builders/train configs, `docs/artifacts/{v5,perf,phase*}`, non-v6 `training/runs/`, non-v6 GGUFs (~193G), `profiler_stage/{adapted,unadapted}`, obsolete HF bases (Gemma, AfriqueQwen, NLLB, etc.)
+- **Slimmed:** `try_prompt.py` → single Q5 model; `download_base_models.py` → Qwen3-1.7B only; docs/READMEs rewritten for EN-only v6
+- **Staged:** `adtc-2026-submission-template/` with `qwen3_1_7b_merged_v6-Q5_K_M.gguf` + `metadata.json` + `download_model.sh`
+
+### Next
+1. Fill submission `REPORT.md` + demo video on laptop profiler numbers.
+2. Optional: `git push` when ready.
+
+---
+
+## 2026-08-25 — Rename HPC scripts + PIPELINE.md
+
+### Outcome
+Renamed all numbered Slurm scripts in `adtc/hpc/` to descriptive names (no leading digits). Added [`docs/PIPELINE.md`](./PIPELINE.md) as the end-to-end data → model → training → results guide.
+
+### What
+- `02h_prepare_mix_v6.sbatch` → `prepare_mix.sbatch`, `03_download_models` → `download_models`, `04g_train_sft_v6` → `train_sft`, `05f_merge_lora_v6` → `merge_lora`, `08h_convert_gguf_v6` → `convert_gguf`, `09b_profile_gguf_v6` → `profile_gguf`, `11_try_prompt` → `try_prompt`, `12i_eval_v6_hf` → `eval_hf`, `12j_eval_v6_gguf` → `eval_gguf`, `submit_v6_chain.sh` → `submit_chain.sh`
+- Updated `submit_chain.sh` dependencies + READMEs to match
+
+### Next
+1. Use `bash submit_chain.sh` for future runs.
+
+---
+
+## 2026-08-25 — Submission template chat demo
+
+### Outcome
+Aligned `adtc-2026-submission-template/` with the official ADTC layout and added a self-contained terminal chat demo (venv + `download_model.sh` + `chat.py`). Root README refreshed for TebebAI v6 and the submission demo path.
+
+### What
+- **Removed:** `compile_report.sh`, `REPORT.tex` (not in official template)
+- **Added:** `.gitignore`, `LICENSE` (GPL-3.0), `README.md`, `chat.py`, `requirements.txt` (`llama-cpp-python`)
+- **chat.py:** checks GGUF via `metadata.json` `_runtime.model_path`, multi-turn history, strips `<think>` / `<<>>`
+- **Root README:** TebebAI headline metrics + pointer to submission `chat.py`
+
+### Next
+1. Point `download_model.sh` at a public URL before Gate submission (currently local-stage stub).
+2. Demo: `cd adtc-2026-submission-template && python3 -m venv .venv && … && python chat.py`
+
+---
+
+## 2026-08-25 — REPORT.md rewritten from adtc pipeline
+
+### Outcome
+Rewrote [`adtc-2026-submission-template/REPORT.md`](../../adtc-2026-submission-template/REPORT.md) as a technical ADTC writeup (Problem / Design / Constraints / Benchmarks) grounded in the v6 `adtc/` pipeline, Gate 5 Pareto table, HF frozen eval, and profiler scores.
+
+### What
+- Base Qwen3-1.7B, QLoRA config highlights, `sft_mix_v6` 10473 rows, Slurm chain, Q4/Q5/Q6 table, S_tps/S_mem, Jubail caveat
+- Points to `chat.py` local demo and `adtc/docs` artifacts
+
+### Next
+1. Fill real `team_id` / submitter fields in `metadata.json` before public submit.
+2. Host GGUF + fix `download_model.sh` for credential-free fetch.
+
+---
+
+## 2026-08-25 — HF download_model + model_path rename
+
+### Outcome
+`download_model.sh` now fetches `tebeb_tutor_1.7b.gguf` from Hugging Face `nz2212/tebeb_tutor_1.7b` (idempotent). `metadata.json` `_runtime.model_path` is `model/tebeb_tutor_1.7b.gguf`. Local `model/` already has the full GGUF; no full re-download needed — HF URL was confirmed reachable earlier (resolve → CDN).
+
+### What
+- Updated `chat.py` default, README/REPORT path strings
+- Cleaned interrupted `.partial` / `.localbak` after a cancelled full fetch
+
+### Next
+1. Submit when Devpost fields + public repo are ready.
+

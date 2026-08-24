@@ -49,13 +49,27 @@ def gen(model, tok, prompt: str, max_new: int = 96) -> str:
     messages = [{"role": "user", "content": prompt}]
     if hasattr(tok, "apply_chat_template"):
         try:
-            text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            # Qwen3: disable chain-of-thought for scoring speed + answer extraction.
+            text = tok.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            try:
+                text = tok.apply_chat_template(
+                    messages, tokenize=False, add_generation_prompt=True
+                )
+            except Exception:  # noqa: BLE001
+                text = prompt
         except Exception:  # noqa: BLE001
             text = prompt
     else:
         text = prompt
     inputs = tok(text, return_tensors="pt")
-    inputs = {k: v.to(model.device) for k, v in inputs.items()}
+    device = next(model.parameters()).device
+    inputs = {k: v.to(device) for k, v in inputs.items()}
     with torch.no_grad():
         out = model.generate(**inputs, max_new_tokens=max_new, do_sample=False)
     gen_ids = out[0][inputs["input_ids"].shape[-1] :]

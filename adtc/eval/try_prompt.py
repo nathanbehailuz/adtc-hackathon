@@ -37,55 +37,15 @@ GGUF = ROOT / "artifacts" / "gguf" / "adapted"
 
 MODELS = [
     {
-        "name": "Qwen3-1.7B adapted Q4_K_M  (leaderboard #1)",
-        "path": GGUF / "qwen3_1_7b_merged_v0-Q4_K_M.gguf",
-    },
-    {
-        "name": "Gemma 3 4B adapted Q4_K_M  (best Amharic accuracy)",
-        "path": GGUF / "gemma3_4b_merged_v0-Q4_K_M.gguf",
-    },
-    {
-        "name": "Qwen3-4B adapted Q4_K_M",
-        "path": GGUF / "qwen3_4b_merged_v0-Q4_K_M.gguf",
-    },
-    {
-        "name": "Qwen2.5-3B Instruct adapted Q4_K_M",
-        "path": GGUF / "qwen25_3b_instruct_merged_v0-Q4_K_M.gguf",
-    },
-    {
-        "name": "Gemma 3 4B adapted v2 Q4_K_M  (Amharic STEM mix)",
-        "path": GGUF / "gemma3_4b_merged_v2-Q4_K_M.gguf",
-    },
-    {
-        "name": "Qwen3-1.7B adapted v2 Q4_K_M  (Amharic STEM mix)",
-        "path": GGUF / "qwen3_1_7b_merged_v2-Q4_K_M.gguf",
-    },
-    {
-        "name": "Gemma 3 4B adapted v3 Q4_K_M  (CPT→SFT on-disk mix)",
-        "path": GGUF / "gemma3_4b_merged_v3-Q4_K_M.gguf",
-    },
-    {
-        "name": "Gemma 3 4B adapted v4 Q4_K_M  (AfriqueLLM-first SFT)",
-        "path": GGUF / "gemma3_4b_merged_v4-Q4_K_M.gguf",
-    },
-    {
-        "name": "AfriqueQwen3.5-4B-ExtendedCM v5  (CPT→SFT, bilingual STEM) [HF]",
-        "path": GGUF / "qwen35_extcm_merged_v5-Q4_K_M.gguf",  # fallback path for display
-        "hf_path": str(ROOT / "training" / "runs" / "qwen35_extcm_merged_v5"),
+        "name": "Tebeb Tutor 1.7B Q5_K_M  (English-only STEM tutor, Gate 5 winner)",
+        "path": GGUF / "tebeb_tutor_1.7b-Q5_K_M.gguf",
     },
 ]
 
-# Folded into chat as role=system (llama.cpp prepends it for Gemma, which has no system turn).
-SYSTEM_PROMPT = """You are a bilingual STEM tutor for English and Amharic.
+SYSTEM_PROMPT = """You are an English STEM tutor.
 
-Language:
-- If the user writes in Amharic (Ethiopic / Geʽez script), write the explanation in Amharic.
-- If the user explicitly asks for Amharic (for example "in Amharic" or "በአማርኛ"), write those requested parts in Amharic.
-- Otherwise write the explanation in English.
-
-Math:
-- Keep equations, expressions, numbers, variables (x, y, …), operators, and fractions in standard mathematical notation. Do not rewrite 2x + 5 = 13 as Amharic words.
-- Only the surrounding explanation and hints should be in Amharic when Amharic is required."""
+- Explain clearly for a student: solve step-by-step, give hints without revealing final answers, or diagnose first errors when asked.
+- Keep equations, expressions, numbers, variables, operators, and fractions in standard mathematical notation."""
 
 
 def chat_messages(prompt: str) -> list[dict]:
@@ -120,33 +80,6 @@ PROMPTS = [
             "at the farmers' market daily for $2 per fresh duck egg. How much in dollars "
             "does she make every day at the farmers' market?"
         ),
-    },
-    {
-        "name": "AM solve — 2x + 5 = 13",
-        "text": "ፍታ፡ 2x + 5 = 13 ከሆነ x ስንት ነው?",
-    },
-    {
-        "name": "AM hint — 5x = 20 (no answer)",
-        "text": "ተማሪው በ 5x = 20 ላይ ተጣብቋል። መልሱን ሳትገልጽ አንድ ፍንጭ ስጥ።",
-    },
-    {
-        "name": "AM first-error — 2x + 5 = 13 → x = 9",
-        "text": (
-            "አንድ ተማሪ 2x + 5 = 13 ብሎ ጽፎ x = 9 አለ። የመጀመሪያውን ስህተት ጠቁም፣ "
-            "ከዚያም መልሱን ሳትገልጽ አንድ ፍንጭ ስጥ።"
-        ),
-    },
-    {
-        "name": "AM MGSM — Janet's ducks",
-        "text": (
-            "የጃኔት ዳክዬዎች በቀን 16 እንቁላሎችን ይጥላሉ። በየቀኑ ሦስት ለቁርስ ትበላለች እና በየቀኑ "
-            "ለጓደኞቹዋ በአራቱ ማፋን ትጋግራለች። ቀሪውን በየቀኑ በአርሶ አደሮች ገበያ በ 2 ዶላር "
-            "ለእያንዳንዱ ትኩስ ዳክዬ እንቁላል ትሸጣለች። በአርሶ አደሮች ገበያ በየቀኑ በዶላር ምን ያህል ታገኛለች?"
-        ),
-    },
-    {
-        "name": "EN→AM code-switch — what is a variable",
-        "text": "Explain what a variable is in algebra, then give the same idea in Amharic in one sentence.",
     },
     {"name": "Type my own prompt", "text": None},
 ]
@@ -239,7 +172,17 @@ def generate_hf(backend, prompt: str, max_tokens: int, temperature: float) -> st
     _, model, tok = backend
     messages = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}]
     try:
-        text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        text = tok.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+            enable_thinking=False,
+        )
+    except TypeError:
+        try:
+            text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        except Exception:  # noqa: BLE001
+            text = f"{SYSTEM_PROMPT}\n\n{prompt}"
     except Exception:  # noqa: BLE001
         text = f"{SYSTEM_PROMPT}\n\n{prompt}"
     inputs = tok(text, return_tensors="pt")
@@ -259,16 +202,18 @@ def generate_hf(backend, prompt: str, max_tokens: int, temperature: float) -> st
 def generate(llm, prompt: str, max_tokens: int, temperature: float) -> str:
     if isinstance(llm, tuple) and llm[0] == "hf":
         return generate_hf(llm, prompt, max_tokens, temperature)
+    # Qwen3 GGUF: /no_think cuts CoT for faster, cleaner replies.
+    user_prompt = prompt if prompt.lstrip().startswith("/no_think") else f"/no_think\n{prompt}"
     try:
         out = llm.create_chat_completion(
-            messages=chat_messages(prompt),
+            messages=chat_messages(user_prompt),
             max_tokens=max_tokens,
             temperature=temperature,
         )
         return out["choices"][0]["message"]["content"] or ""
     except Exception:  # noqa: BLE001
         # Gemma templates may reject role=system; fold the policy into the user turn.
-        folded = f"{SYSTEM_PROMPT}\n\n{prompt}"
+        folded = f"{SYSTEM_PROMPT}\n\n{user_prompt}"
         try:
             out = llm.create_chat_completion(
                 messages=[{"role": "user", "content": folded}],
@@ -404,7 +349,7 @@ def main() -> None:
             f"# {backend_tag}\n"
             f"# slurm_job={os.environ.get('SLURM_JOB_ID', '-')}\n"
             f"# host={os.environ.get('SLURMD_NODENAME', os.environ.get('HOSTNAME', '-'))}\n"
-            f"# system=amharic-policy (explain in AM if user writes AM or asks for AM; keep equations as math)\n"
+            f"# system=english-stem-tutor\n"
         )
         write_out(args.out, header)
 

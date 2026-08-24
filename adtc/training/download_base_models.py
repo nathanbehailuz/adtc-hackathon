@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Download Hugging Face *base models* for Phase 2 screen / Phase 4 training (cloud/HPC).
+"""Download the v6 English-only base model (Qwen3-1.7B) for QLoRA SFT.
 
 Does not download GGUF submission weights (that stays in submission ``download_model.sh``).
 
 Usage (from ``adtc/``)::
 
   python training/download_base_models.py
-  python training/download_base_models.py --only qwen3_1_7b
   python training/download_base_models.py --revision main
 
 Run log: ``logs/download_models/<run>.*`` (OK/FAIL per model).
@@ -23,52 +22,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from lib.run_log import RunLogger  # noqa: E402
 
-# Phase 2 / 4 shortlist — aligned with docs/PRD.md Phase 2 baseline screen.
+# v6 English-only track — single base model.
 DEFAULT_MODELS = [
     {
         "key": "qwen3_1_7b",
         "hf_id": "Qwen/Qwen3-1.7B",
-        "role": "efficiency_challenger",
-    },
-    {
-        "key": "qwen3_4b",
-        "hf_id": "Qwen/Qwen3-4B",
-        "role": "accuracy_candidate",
-    },
-    {
-        "key": "gemma3_4b",
-        "hf_id": "google/gemma-3-4b-it",
-        "role": "architecture_control",
-    },
-    {
-        "key": "qwen25_3b_instruct",
-        "hf_id": "Qwen/Qwen2.5-3B-Instruct",
-        "role": "middle_size_control",
-    },
-    {
-        "key": "qwen35_2b",
-        "hf_id": "Qwen/Qwen3.5-2B",
-        "role": "compat_check_optional",
-    },
-    {
-        "key": "qwen35_4b",
-        "hf_id": "Qwen/Qwen3.5-4B",
-        "role": "compat_check_optional",
-    },
-    {
-        "key": "qwen35_extcm",
-        "hf_id": "McGill-NLP/AfriqueQwen3.5-4B-ExtendedCM",
-        "role": "v5_primary_extcm",
-    },
-    {
-        "key": "qwen35_afrique",
-        "hf_id": "McGill-NLP/AfriqueQwen3.5-4B",
-        "role": "v5_secondary_afrique",
-    },
-    {
-        "key": "qwen3_afrique",
-        "hf_id": "McGill-NLP/AfriqueQwen-4B",
-        "role": "v5_fallback_text_only",
+        "role": "v6_primary",
     },
 ]
 

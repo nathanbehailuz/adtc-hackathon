@@ -1,0 +1,47 @@
+[
+  {
+    "key": "qwen3_1_7b_merged_v6-Q4_K_M",
+    "gguf": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/qwen3_1_7b_merged_v6-Q4_K_M.gguf",
+    "profile_ok": true,
+    "tps": 2.54,
+    "peak_rss_mb": 1897.66,
+    "steady_rss_mb": 1797.87,
+    "throttled": false,
+    "arc_easy": null,
+    "S_acc": 0.0,
+    "S_tps": 16.93,
+    "S_mem": 73.53,
+    "composite": 19.79,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/v6/phase5_profile_qwen3_1_7b_merged_v6-Q4_K_M.json"
+  },
+  {
+    "key": "tebeb_tutor_1.7b-Q5_K_M",
+    "gguf": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/tebeb_tutor_1.7b-Q5_K_M.gguf",
+    "profile_ok": true,
+    "tps": 2.46,
+    "peak_rss_mb": 1402.11,
+    "steady_rss_mb": 1303.99,
+    "throttled": false,
+    "arc_easy": null,
+    "S_acc": 0.0,
+    "S_tps": 16.4,
+    "S_mem": 80.44,
+    "composite": 21.01,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/v6/phase5_profile_qwen3_1_7b_merged_v6-Q5_K_M.json"
+  },
+  {
+    "key": "qwen3_1_7b_merged_v6-Q6_K",
+    "gguf": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/qwen3_1_7b_merged_v6-Q6_K.gguf",
+    "profile_ok": true,
+    "tps": 2.44,
+    "peak_rss_mb": 1553.22,
+    "steady_rss_mb": 1459.68,
+    "throttled": false,
+    "arc_easy": null,
+    "S_acc": 0.0,
+    "S_tps": 16.27,
+    "S_mem": 78.33,
+    "composite": 20.55,
+    "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/v6/phase5_profile_qwen3_1_7b_merged_v6-Q6_K.json"
+  }
+]

@@ -1,9 +1,0 @@
-{
-  "mode": "nllb+simonbutt_capped",
-  "sources": {
-    "nllb_good": 657,
-    "simonbutt_total": 7473
-  },
-  "n_out": 3157,
-  "simonbutt_used": 2500
-}

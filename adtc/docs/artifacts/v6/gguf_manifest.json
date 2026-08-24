@@ -1,0 +1,26 @@
+{
+  "name": "tebeb_tutor_1.7b",
+  "files": {
+    "qwen3_1_7b_merged_v6-Q4_K_M.gguf": {
+      "bytes": 1107408576,
+      "sha256": "ff7a76127a5dcc6c8a64632c664046828648cade7fe2f14b3009b992b13d2363"
+    },
+    "tebeb_tutor_1.7b-Q5_K_M.gguf": {
+      "bytes": 1257879232,
+      "sha256": "0122d3f1a6556ec871f66d8bf63305246d1060767f764c389a6f8c9fee0b7354"
+    },
+    "qwen3_1_7b_merged_v6-Q6_K.gguf": {
+      "bytes": 1417754304,
+      "sha256": "ffac69c63eb64cf66338e7f8d35d8c6a77864258c20b2dbc5c198a487881d55d"
+    },
+    "qwen3_1_7b_merged_v6-Q8_0.gguf": {
+      "bytes": 1834426048,
+      "sha256": "14ebb315ed5005db87c65aba3b5521e2e41f3f09000ef5cf1c812aec749244ee"
+    },
+    "qwen3_1_7b_merged_v6-f16.gguf": {
+      "bytes": 3447348928,
+      "sha256": "1ed39c200be4809a27ce5c4d506af15fc7f50e7d27882ff4a3b9db2fae2fd806"
+    }
+  },
+  "updated": "2026-08-24T11:30:14.099945+00:00"
+}

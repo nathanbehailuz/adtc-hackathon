@@ -57,16 +57,18 @@ def make_llm(gguf: Path, n_ctx: int = 2048, n_threads: int | None = None):
 
 def gen(llm, prompt: str, max_new: int = 96) -> str:
     # Prefer chat if the model exposes a chat template via llama.cpp; else raw completion.
+    # Qwen3: /no_think reduces CoT tokens (better TPS + cleaner answer extract).
+    user = f"/no_think\n{prompt}"
     try:
         out = llm.create_chat_completion(
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "user", "content": user}],
             max_tokens=max_new,
             temperature=0.0,
         )
         return out["choices"][0]["message"]["content"] or ""
     except Exception:  # noqa: BLE001
         out = llm(
-            prompt,
+            user,
             max_tokens=max_new,
             temperature=0.0,
             echo=False,

@@ -1,0 +1,45 @@
+{
+  "gguf": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/tebeb_tutor_1.7b-Q5_K_M.gguf",
+  "limit": null,
+  "frozen_suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 7,
+      "acc": 0.028
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 79,
+      "acc": 0.316
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 0,
+      "acc": 0.0
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 30,
+      "acc": 0.3
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 101,
+      "acc": 1.0,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "<think>\n\n</think>\n\nThe tank is 3/5 * 120 = <<3/5*120=72>>72 liters full.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "<think>\n\n</think>\n\nMultiplying both sides of an equation by the same non-zero number keeps the equality true because the operation is reversible."
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "<think>\n\n</think>\n\nHint: start by identifying the first operation, then continue from there. Do not state the final numeric answer."
+        }
+      ]
+    }
+  }
+}

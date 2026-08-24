@@ -1,0 +1,45 @@
+{
+  "gguf": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/qwen3_1_7b_merged_v6-Q4_K_M.gguf",
+  "limit": null,
+  "frozen_suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 7,
+      "acc": 0.028
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 82,
+      "acc": 0.328
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 0,
+      "acc": 0.0
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 33,
+      "acc": 0.33
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 101,
+      "acc": 1.0,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "<think>\n\n</think>\n\nThe tank holds 120 x 3/5 = <<120*3/5=72>>72 liters.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "<think>\n\n</think>\n\nMultiplying both sides of an equation by the same non-zero number keeps the equality true because multiplication is a reversible operation."
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "<think>\n\n</think>\n\nHint: start by subtracting 7 from both sides. Do not state the final answer."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "key": "tebeb_tutor_1.7b-Q5_K_M",
+  "gguf": "/scratch/nz2212/adtc-hackathon/adtc/artifacts/gguf/adapted/tebeb_tutor_1.7b-Q5_K_M.gguf",
+  "profile_ok": true,
+  "tps": 2.46,
+  "peak_rss_mb": 1402.11,
+  "steady_rss_mb": 1303.99,
+  "throttled": false,
+  "arc_easy": null,
+  "S_acc": 0.0,
+  "S_tps": 16.4,
+  "S_mem": 80.44,
+  "composite": 21.01,
+  "artifact": "/scratch/nz2212/adtc-hackathon/adtc/docs/artifacts/v6/phase5_profile_qwen3_1_7b_merged_v6-Q5_K_M.json"
+}

@@ -1,9 +1,0 @@
-{
-  "files": [
-    "gemma3_4b_merged_v3-Q4_K_M.gguf",
-    "gemma3_4b_merged_v3-Q5_K_M.gguf",
-    "gemma3_4b_merged_v3-Q6_K.gguf",
-    "gemma3_4b_merged_v3-Q8_0.gguf",
-    "gemma3_4b_merged_v3-f16.gguf"
-  ]
-}

@@ -1,127 +1,67 @@
-# Datasets catalog — EN + Amharic STEM tutor
+# Datasets — v6 English-only STEM tutor
 
-**On-disk status (what was downloaded, splits, row counts):** [`DATASETS_REPORT.md`](./DATASETS_REPORT.md).  
-**Measured eval / profiler / leaderboard:** [`RESULTS_REPORT.md`](./RESULTS_REPORT.md).
+**Measured eval / profiler:** [`RESULTS_REPORT.md`](./RESULTS_REPORT.md).  
+**Mix report:** [`artifacts/v6/sft_mix_v6_report.md`](./artifacts/v6/sft_mix_v6_report.md).
 
-**Rule:** frozen eval never enters training. Dedup train against `adtc/data/eval/` before every mix.
-
-Language codes: BCP-47 `am` / Iroko HF configs often `amh`; English `en` / `eng`. FineWeb Amharic: `amh_Ethi`.
+**Rule:** frozen eval never enters training. Dedup train against `adtc/data/eval/` before every mix (`eval/dedup_against_eval.py`).
 
 ---
 
-## Eval (freeze first) — DO NOT TRAIN
+## Train (v6)
 
-| Suite | HF id / path | Config / split | Use |
-|-------|--------------|----------------|-----|
-| AfriMGSM (Amharic) | [`masakhane/afrimgsm`](https://huggingface.co/datasets/masakhane/afrimgsm) | `amh` test | Amharic math |
-| AfriMGSM (English) | same | `eng` test | EN math control / translate-test |
-| AfriMMLU | [`masakhane/afrimmlu`](https://huggingface.co/datasets/masakhane/afrimmlu) | `amh` test | Knowledge / STEM |
-| AfriXNLI | [`masakhane/afrixnli`](https://huggingface.co/datasets/masakhane/afrixnli) | `amh` test | Language understanding |
-| Custom tutoring | `adtc/data/eval/custom_tutoring_v0.jsonl` | authored | Product behaviors |
-| EN STEM holdout | `adtc/data/eval/en_stem_holdout_v0.jsonl` | GSM8K **test** | Forgetting check |
-| Fertility parallels | `adtc/data/eval/fertility_parallel_v0.jsonl` | authored EN‖am | Tokenizer diagnostics |
+Built by [`data/mix_sft_v6.py`](../data/mix_sft_v6.py) → `data/train/sft_mix_v6.jsonl`.
 
-Also keep out of training: Belebele, Global-MMLU, Global-MGSM (if used later).
+| Source | HF id | Rows (v6) | Behaviors |
+|--------|-------|----------:|-----------|
+| GSM8K train | [`openai/gsm8k`](https://huggingface.co/datasets/openai/gsm8k) `main/train` | 7473 | solve, explain, hint, first_error |
+| SciQ train | [`allenai/sciq`](https://huggingface.co/datasets/allenai/sciq) train | 3000 | solve, explain |
 
-**Freeze:** [`../data/eval/FREEZE.md`](../data/eval/FREEZE.md). Language: [`LANGUAGE.md`](./LANGUAGE.md).
+**Total:** 10473 rows. Dedup vs `en_stem_holdout_v0` + `afrimgsm_eng_test_v0`: 0 dropped.
 
----
-
-## First-experiment recipe
-
-```
-CPT (only if Phase 4 diagnostics require it):
-  FineWeb2-amh_Ethi-100M + Amharic News + AddisAI Wikipedia + AfriNLLB
-    →
-SFT (default first adaptation):
-  Walia + FineTome + AfriqueLLM Amharic GSM8K
-  + EN STEM (GSM8K train / SciQ) + verified MT STEM
-  (+ optional R1 / Dolly / TACO after dedup)
-```
-
-Scripts: `data/download_train_sources.py`, `normalize_sft_sources.py`, `normalize_cpt_sources.py`, `mix_sft.py`.
-
-**Run logs:** each of those scripts (plus model download / SFT / CPT train) writes OK/FAIL under `adtc/logs/<stage>/`. See [`RUNLOGS.md`](./RUNLOGS.md). Mid-run Ctrl+C still flushes a partial summary + `download_manifest_v0.json`.
-
----
-
-## CPT pools (prepare now; run only if needed)
-
-| Role | HF id | Notes |
-|------|-------|--------|
-| Native Amharic (primary) | [`MultilingualUnigramLM/FineWeb2-amh_Ethi-100M`](https://huggingface.co/datasets/MultilingualUnigramLM/FineWeb2-amh_Ethi-100M) | ~100M tokens; start here |
-| Native Amharic (scale-up) | [`HuggingFaceFW/fineweb-2`](https://huggingface.co/datasets/HuggingFaceFW/fineweb-2) `amh_Ethi` | **Not downloaded** in first pass |
-| Native news | [`dagn/expanded-amharic-news-dataset`](https://huggingface.co/datasets/dagn/expanded-amharic-news-dataset) | Fluency / discourse |
-| Educational / encyclopedic | [`addisai/wikipedia-amharic`](https://huggingface.co/datasets/addisai/wikipedia-amharic) | Prefer STEM filter later |
-| Parallel EN↔AM | [`AfriNLP/AfriNLLB-train`](https://huggingface.co/datasets/AfriNLP/AfriNLLB-train) | CPT alignment **or** transform to translate SFT |
-| Optional (filter hard) | [`a3xrfgb/amharic-sentences-corpus`](https://huggingface.co/datasets/a3xrfgb/amharic-sentences-corpus) | Social-media origin; secondary |
-
-Suggested CPT mix (when triggered): native ~35% / translated-edu+parallel ~25% / EN STEM ~20% / EN replay ~10% / code ~10%.
-
----
-
-## SFT pools
-
-| Role | HF id | Notes |
-|------|-------|--------|
-| General Amharic instruct | [`EthioNLP/Amharic_Instruction_dataset`](https://huggingface.co/datasets/EthioNLP/Amharic_Instruction_dataset) (Walia) | Core |
-| Conversational | [`addisai/FineTome-single-turn-dedup-amharic`](https://huggingface.co/datasets/addisai/FineTome-single-turn-dedup-amharic) | ~83k |
-| STEM / math Amharic | [`peterlu02/afriquellm-coldstart-gsm8k-11lang`](https://huggingface.co/datasets/peterlu02/afriquellm-coldstart-gsm8k-11lang) | Filter Amharic |
-| Reasoning aug | [`lightblue/reasoning-multilingual-R1-Llama-70B-train`](https://huggingface.co/datasets/lightblue/reasoning-multilingual-R1-Llama-70B-train) | Filter + quality gate |
-| EN STEM tutoring | [`openai/gsm8k`](https://huggingface.co/datasets/openai/gsm8k) **train** | `build_en_stem_sft.py` |
-| EN science QA | [`allenai/sciq`](https://huggingface.co/datasets/allenai/sciq) train | same builder |
-| Own translated STEM | MT via `build_translate_am.py` | Review before heavy use |
-| Supplementary | [`iocuydi/amharic-dolly-15k`](https://huggingface.co/datasets/iocuydi/amharic-dolly-15k), [`CRLannister/Amharic`](https://huggingface.co/datasets/CRLannister/Amharic) | After Walia/FineTome dedup |
-
-**Train mixes on disk (16 Aug 2026):** `data/train/sft_mix_v0.jsonl` (stub MT); `data/train/sft_mix_v1.jsonl` (NLLB-200 real MT — see `docs/artifacts/sft_mix_v1_direction_counts.json`). **AfriqueLLM GSM8K** Hub snapshot still missing from downloads — known gap (not in mix_v1).
-
-### SFT row schema (JSONL)
+Row schema (JSONL):
 
 ```json
 {
-  "id": "en_en_solve_0001",
+  "id": "en_en_solve_gsm8k_v6_00000",
   "direction": "en_en",
   "behavior": "solve",
-  "messages": [
-    {"role": "user", "content": "..."},
-    {"role": "assistant", "content": "..."}
-  ],
-  "source": "gsm8k_train"
+  "messages": [{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}],
+  "source": "gsm8k_train_v6"
 }
 ```
 
-`direction`: `en_en` | `am_am` | `en_am` | `am_en`  
-`behavior`: `solve` | `explain` | `hint` | `first_error` | `simplify` | `related_exercise` | `code_switch` | `instruct` | `translate`
+---
+
+## Eval (frozen — DO NOT TRAIN)
+
+Under `adtc/data/eval/` (see [`FREEZE.md`](../data/eval/FREEZE.md)).
+
+| Suite | Path | Use (v6) |
+|-------|------|----------|
+| AfriMGSM EN | `afrimgsm_eng_test_v0.jsonl` | Primary EN math |
+| EN STEM holdout | `en_stem_holdout_v0.jsonl` | GSM8K test holdout |
+| Custom tutoring | `custom_tutoring_v0.jsonl` | Product behaviors |
+| AfriMGSM AM | `afrimgsm_amh_test_v0.jsonl` | Secondary (not trained) |
+| AfriMMLU AM | `afrimmlu_amh_test_v0.jsonl` | Secondary (not trained) |
+
+Dedup at mix time uses EN holdout + AfriMGSM EN only.
 
 ---
 
-## Excluded / cautious
+## Base model cache
 
-| Dataset | Why |
-|---------|-----|
-| `YoseAli/amharic-llm-training-data` | Mixed provenance; possible benchmark contamination — **do not use wholesale** |
-| All `adtc/data/eval/*` | Frozen evaluation |
-| Full FineWeb2 (this pass) | Too large; use 100M slice first |
+- HF weights: `data/raw/hf_home/models--Qwen--Qwen3-1.7B/`
+- Dataset cache: `data/raw/hf/` (GSM8K, SciQ via `datasets`)
+
+Download: `python training/download_base_models.py --only qwen3_1_7b`
 
 ---
 
-## Layout
-
-```
-adtc/data/eval/              # frozen holdouts (commit)
-adtc/data/raw/hf/            # HF cache (gitignored)
-adtc/data/raw/download_manifest_v0.json   # latest download status (updated per source)
-adtc/data/train/sources/     # normalized SFT JSONL (gitignored if large)
-adtc/data/train/cpt/         # normalized CPT text JSONL (gitignored)
-adtc/data/train/sft_mix_*.jsonl
-adtc/logs/<stage>/           # per-run OK/FAIL logs (gitignored) — see RUNLOGS.md
-```
-
-Download: `python data/download_train_sources.py --profile first_experiment`
-
-After any interrupt, inspect:
+## HPC prep
 
 ```bash
-cat data/raw/download_manifest_v0.json
-cat logs/download_train/latest.summary.json
+cd adtc/hpc
+sbatch prepare_mix.sbatch   # builds sft_mix_v6.jsonl on compute node
 ```
+
+No separate Amharic corpus download job — v6 mix pulls GSM8K/SciQ via `datasets` inside the mix script.

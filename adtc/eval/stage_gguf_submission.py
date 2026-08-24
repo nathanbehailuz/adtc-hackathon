@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -12,8 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_META = {
     "team_id": "adtc_hpc_screen",
     "domain": "math_scientific_reasoning",
-    "language_scope": ["en", "am"],
-    "african_alpha_claim": True,
+    "language_scope": ["en"],
+    "african_alpha_claim": False,
     "budget_laptop_claim": True,
     "submitter": {
         "name": "ADTC HPC",
@@ -23,7 +24,7 @@ DEFAULT_META = {
     "cross_disciplinary_pairing": {
         "discipline": "education",
         "load_bearing": True,
-        "description": "Offline bilingual Amharic/English STEM tutor screen run.",
+        "description": "Offline English STEM tutor (solve, hint, first-error).",
     },
     "test_prompts": [
         {
@@ -32,7 +33,7 @@ DEFAULT_META = {
         },
         {
             "prompt_id": "tp_002",
-            "prompt": "አንድ ተማሪ 2x + 5 = 13 ብሎ ጽፎ x = 9 አለ። የመጀመሪያውን ስህተት ጠቁም።",
+            "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
         },
     ],
     "model": {
@@ -68,7 +69,7 @@ def main() -> None:
     dest = model_dir / "model.gguf"
     # Prefer hardlink to save disk; fall back to symlink then copy.
     try:
-        dest.hardlink_to(gguf)
+        os.link(gguf, dest)
     except OSError:
         try:
             dest.symlink_to(gguf)

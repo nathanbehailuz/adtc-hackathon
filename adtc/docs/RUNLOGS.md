@@ -1,22 +1,18 @@
-# Run logs (HPC / interrupted downloads)
+# Run logs (HPC / interrupted jobs)
 
 Every pipeline stage writes a **timestamped run log** under `adtc/logs/<stage>/` so a Ctrl+C or node kill still leaves OK/FAIL status.
 
-## Layout
+## Layout (v6)
 
 ```
 adtc/logs/
-  download_train/     # data/download_train_sources.py
-  normalize_cpt/      # data/normalize_cpt_sources.py
-  normalize_sft/      # data/normalize_sft_sources.py
-  mix_sft/            # data/mix_sft.py
   download_models/    # training/download_base_models.py
   train_sft/          # training/train_sft_qlora.py
-  train_cpt/          # training/train_cpt_qlora.py (only if Gate 4 triggers CPT)
   merge_lora/         # training/merge_lora.py
+  try_prompt/         # eval/try_prompt.py (Slurm try_prompt.sbatch)
 ```
 
-Per run (example `20260816T104500Z_a1b2c3d4`):
+Per run (example `20260824T104500Z_a1b2c3d4`):
 
 | File | Purpose |
 |------|---------|
@@ -31,58 +27,31 @@ Shared helper: [`../lib/run_log.py`](../lib/run_log.py).
 
 ```bash
 cd adtc
-# last download attempt
-cat logs/download_train/latest.summary.json | python -m json.tool | head -80
-
-# human log
-ls -t logs/download_train/*.log | head -1 | xargs cat
+cat logs/download_models/latest.summary.json | python -m json.tool | head -40
+cat logs/train_sft/latest.summary.json | python -m json.tool | head -40
+ls -t logs/train_sft/*.log | head -1 | xargs cat
 ```
 
-`counts.ok` / `counts.error` / `counts.skipped` tell you what finished. Interrupted items show `status: interrupted` or `error` with reason.
-
-## Also written (stage-specific)
-
-| Stage | Extra artifact |
-|-------|----------------|
-| download_train | `data/raw/download_manifest_v0.json` (rewritten after **each** source) |
-| normalize_cpt | `data/train/cpt/cpt_normalize_summary_v0.json` |
-| download_models | `training/model_download_manifest_v0.json` |
-| train_sft / train_cpt | `training/runs/.../train_metrics.json` |
-
-## HPC / Jubail order (with logs)
-
-Prefer Slurm from a login node (see [`../hpc/README.md`](../hpc/README.md)):
+## HPC / Jubail order (v6)
 
 ```bash
 cd /scratch/nz2212/adtc-hackathon/adtc/hpc
+sbatch setup_env.sbatch
+sbatch download_models.sbatch
 bash submit_chain.sh
-# resume mid-pipeline: CHAIN_FROM=4 bash submit_chain.sh
-# stage OK/FAIL still under adtc/logs/<stage>/; Slurm stdout in adtc/hpc/logs/
+# Slurm stdout: adtc/hpc/logs/; stage logs: adtc/logs/<stage>/
 ```
 
-Equivalent plain Python (only inside an allocated job / interactive session — **not** on login):
+Equivalent plain Python (inside an allocated job — **not** on login):
 
 ```bash
 cd adtc
-# 1) finish / resume train corpora (partial OK is fine; re-run or --only …)
-python data/download_train_sources.py --profile first_experiment
-
-# 2) normalize
-python data/normalize_cpt_sources.py
-python data/normalize_sft_sources.py
-python data/build_en_stem_sft.py --limit 2000
-python data/mix_sft.py --sft data/train/sources/*.jsonl \
-  --en-stem data/train/en_stem_sft_v0.jsonl \
-  --eval data/eval/custom_tutoring_v0.jsonl data/eval/en_stem_holdout_v0.jsonl
-
-# 3) base models (Phase 2)
-python training/download_base_models.py
-
-# 4) SFT (after mix exists)
-cd training && python train_sft_qlora.py --config configs/qlora_qwen3_1_7b.yaml
-
-# 5) CPT only if diagnostics require it
-# python train_cpt_qlora.py --config configs/cpt_qwen3_1_7b.yaml
+python data/mix_sft_v6.py
+python training/download_base_models.py --only qwen3_1_7b
+cd training && python train_sft_qlora.py --config configs/qlora_qwen3_1_7b_v6.yaml
+python merge_lora.py --base Qwen/Qwen3-1.7B \
+  --adapter runs/qwen3_1_7b_qlora_v6/adapter \
+  --out runs/qwen3_1_7b_merged_v6
 ```
 
-`logs/` is gitignored — copy `*.summary.json` into `docs/artifacts/` only when you want a committed record of a run.
+`logs/` is gitignored — eval/profiler JSON under `docs/artifacts/v6/` is the committed record.

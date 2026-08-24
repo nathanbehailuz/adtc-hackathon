@@ -1,0 +1,49 @@
+{
+  "model": "/scratch/nz2212/adtc-hackathon/adtc/training/runs/qwen3_1_7b_merged_v6",
+  "limit": null,
+  "suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 6,
+      "acc": 0.024
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 98,
+      "acc": 0.392
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 108,
+      "acc": 0.216
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 37,
+      "acc": 0.37
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 99,
+      "acc": 0.9801980198019802,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "The tank is 3/5 * 120 = <<3/5*120=72>>72 liters full.\n#### 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "Multiplying both sides of an equation by the same non-zero number keeps the equality true because the operations are reversible."
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "Hint: start by performing one operation on both sides of the equation. Do not state the final value of x."
+        }
+      ]
+    }
+  },
+  "forget_proxy": {
+    "en_stem_acc": 0.37,
+    "am_mgsm_acc": 0.024
+  }
+}

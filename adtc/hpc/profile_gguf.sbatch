@@ -35,7 +35,7 @@ stage_root = root / "artifacts/profiler_stage/v6"
 acc_limit = os.environ.get("ACC_LIMIT", "50")
 keys = [
     "qwen3_1_7b_merged_v6-Q4_K_M",
-    "qwen3_1_7b_merged_v6-Q5_K_M",
+    "tebeb_tutor_1.7b-Q5_K_M",
     "qwen3_1_7b_merged_v6-Q6_K",
 ]
 summary = []

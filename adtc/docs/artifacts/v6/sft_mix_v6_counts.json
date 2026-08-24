@@ -1,0 +1,17 @@
+{
+  "n": 10473,
+  "by_source": {
+    "gsm8k_train_v6": 7473,
+    "sciq_train_v6": 3000
+  },
+  "by_behavior": {
+    "solve": 3369,
+    "explain": 3368,
+    "hint": 1868,
+    "first_error": 1868
+  },
+  "by_direction": {
+    "en_en": 10473
+  },
+  "out": "data/train/sft_mix_v6.jsonl"
+}
