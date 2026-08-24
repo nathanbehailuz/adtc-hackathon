@@ -55,6 +55,21 @@ DEFAULT_MODELS = [
         "hf_id": "Qwen/Qwen3.5-4B",
         "role": "compat_check_optional",
     },
+    {
+        "key": "qwen35_extcm",
+        "hf_id": "McGill-NLP/AfriqueQwen3.5-4B-ExtendedCM",
+        "role": "v5_primary_extcm",
+    },
+    {
+        "key": "qwen35_afrique",
+        "hf_id": "McGill-NLP/AfriqueQwen3.5-4B",
+        "role": "v5_secondary_afrique",
+    },
+    {
+        "key": "qwen3_afrique",
+        "hf_id": "McGill-NLP/AfriqueQwen-4B",
+        "role": "v5_fallback_text_only",
+    },
 ]
 
 

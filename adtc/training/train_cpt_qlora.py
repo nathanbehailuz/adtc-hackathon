@@ -66,7 +66,7 @@ def main() -> None:
         import torch
         from datasets import load_dataset
         from peft import LoraConfig
-        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+        from transformers import BitsAndBytesConfig
         from trl import SFTConfig, SFTTrainer
 
         compute_dtype = getattr(torch, cfg.get("bnb_4bit_compute_dtype", "bfloat16"))
@@ -77,26 +77,31 @@ def main() -> None:
             bnb_4bit_use_double_quant=bool(cfg.get("bnb_4bit_use_double_quant", True)),
         )
 
-        tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
-        if tokenizer.pad_token is None:
-            tokenizer.pad_token = tokenizer.eos_token
+        from model_loader import load_pretrained_model, load_tokenizer, suggest_lora_targets
 
-        model = AutoModelForCausalLM.from_pretrained(
+        tokenizer = load_tokenizer(model_id)
+        model_class = str(cfg.get("model_class", "auto"))
+        model = load_pretrained_model(
             model_id,
+            model_class=model_class,
             quantization_config=bnb,
             device_map="auto",
-            trust_remote_code=True,
         )
-        model.config.use_cache = False
-        log.item_ok("load_model", hf_id=model_id)
+        if hasattr(model, "config"):
+            model.config.use_cache = False
+        log.item_ok("load_model", hf_id=model_id, model_class=model_class)
 
+        targets = list(cfg.get("lora_target_modules") or cfg.get("lora_target_modules") or [])
+        if not targets:
+            targets = suggest_lora_targets(model, text_only=True)
+            log.info("lora_targets_auto", targets=targets)
         peft_config = LoraConfig(
             r=int(cfg.get("lora_r", 8)),
             lora_alpha=int(cfg.get("lora_alpha", 16)),
             lora_dropout=float(cfg.get("lora_dropout", 0.05)),
             bias="none",
             task_type="CAUSAL_LM",
-            target_modules=list(cfg.get("lora_target_modules", ["q_proj", "v_proj"])),
+            target_modules=targets,
         )
 
         log.item_start("load_data", path=str(data_path))

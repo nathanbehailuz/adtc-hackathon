@@ -1,0 +1,26 @@
+{
+  "config": {
+    "hf_id": "McGill-NLP/AfriqueQwen-4B",
+    "model_type": "qwen3",
+    "architectures": [
+      "Qwen3ForCausalLM"
+    ],
+    "has_vision_config": false,
+    "vocab_size": 151643,
+    "chat_template_present": true,
+    "max_position_embeddings": 32768,
+    "hidden_size": 2560,
+    "num_hidden_layers": 36
+  },
+  "lora_target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "linear_modules_sample": [],
+  "note": "config-only; standard text proj names assumed"
+}

@@ -1,0 +1,49 @@
+{
+  "model": "/scratch/nz2212/adtc-hackathon/adtc/training/runs/qwen35_extcm_merged_v5",
+  "limit": null,
+  "suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 4,
+      "acc": 0.016
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 7,
+      "acc": 0.028
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 0,
+      "acc": 0.0
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 6,
+      "acc": 0.06
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 101,
+      "acc": 1.0,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "Okay, let's see. The problem says a tank holds 120 liters and it's 3/5 full. I need to find out how many liters are in the tank. Hmm, so the total capacity is 120 liters, and they want to know what 3/"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "Okay, let's see. The question is asking why multiplying both sides of an equation by the same non-zero number keeps the equality true. Hmm, I need to think about the basics of equations here.\n\nSo, an "
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "Okay, the student is stuck on the equation 2x + 7 = 19. I need to give a hint without giving away the answer. Let me think about how to approach this. \n\nFirst, I remember that when solving equations l"
+        }
+      ]
+    }
+  },
+  "forget_proxy": {
+    "en_stem_acc": 0.06,
+    "am_mgsm_acc": 0.016
+  }
+}

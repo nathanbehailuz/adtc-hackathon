@@ -17,8 +17,6 @@ from pathlib import Path
 
 import torch
 from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from lib.run_log import RunLogger  # noqa: E402
@@ -30,23 +28,36 @@ def main() -> None:
     parser.add_argument("--adapter", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--dtype", default="bfloat16", choices=("bfloat16", "float16", "float32"))
+    parser.add_argument(
+        "--model-class",
+        default="auto",
+        choices=("auto", "causal", "qwen3_5"),
+        help="auto tries CausalLM then Qwen3.5 multimodal class",
+    )
     args = parser.parse_args()
 
     log = RunLogger(
         "merge_lora",
-        meta={"base": args.base, "adapter": str(args.adapter), "out": str(args.out)},
+        meta={
+            "base": args.base,
+            "adapter": str(args.adapter),
+            "out": str(args.out),
+            "model_class": args.model_class,
+        },
     )
     try:
+        from model_loader import load_pretrained_model, load_tokenizer
+
         dtype = getattr(torch, args.dtype)
         log.item_start("load_base", hf_id=args.base)
-        tokenizer = AutoTokenizer.from_pretrained(args.base, trust_remote_code=True)
-        base = AutoModelForCausalLM.from_pretrained(
+        tokenizer = load_tokenizer(args.base)
+        base = load_pretrained_model(
             args.base,
+            model_class=args.model_class,
             torch_dtype=dtype,
             device_map="cpu",
-            trust_remote_code=True,
         )
-        log.item_ok("load_base", hf_id=args.base)
+        log.item_ok("load_base", hf_id=args.base, model_class=args.model_class)
 
         log.item_start("load_adapter", path=str(args.adapter))
         model = PeftModel.from_pretrained(base, str(args.adapter))

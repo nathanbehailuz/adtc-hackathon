@@ -1,0 +1,19 @@
+{
+  "n": 21500,
+  "target_total": 25000,
+  "source": {
+    "en_stem_sft_v4": 4000,
+    "afrinllb": 5172,
+    "fineweb2_amh": 7993,
+    "wikipedia_amharic": 3257,
+    "am_stem_nllb_filtered": 1078
+  },
+  "targets": {
+    "native": 10000,
+    "am_stem": 6250,
+    "en_stem": 5000,
+    "struct": 2500,
+    "replay": 1250
+  },
+  "seed": 42
+}

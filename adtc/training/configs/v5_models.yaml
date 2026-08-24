@@ -1,0 +1,39 @@
+# ADTC v5 model manifesto — AfriqueQwen3.5 (+ text-only fallback)
+# Do not train the fallback unless Qwen3.5 fails GGUF/text-only preflight.
+
+seed: 42
+
+models:
+  qwen35_extcm:
+    hf_id: McGill-NLP/AfriqueQwen3.5-4B-ExtendedCM
+    role: primary
+    architecture_family: qwen3_5
+    model_class: qwen3_5
+    notes: Highest-performing 4B AfriqueLLM variant (extended code/math CPT). Multimodal HF class; text-only deploy required.
+
+  qwen35_afrique:
+    hf_id: McGill-NLP/AfriqueQwen3.5-4B
+    role: secondary
+    architecture_family: qwen3_5
+    model_class: qwen3_5
+    notes: Standard AfriqueQwen3.5 CPT. Multimodal HF class; text-only deploy required.
+
+  qwen3_afrique:
+    hf_id: McGill-NLP/AfriqueQwen-4B
+    role: fallback
+    architecture_family: qwen3
+    model_class: causal
+    notes: Pure-text Qwen3-4B Afrique CPT. Use only if Qwen3.5 fails single-GGUF text preflight.
+
+preflight_gates:
+  peak_rss_gb_max: 7.0
+  gen_tps_warn_below: 10.0
+  require_single_gguf_text: true
+  allow_mmproj_for_text: false
+
+baseline_gemma_v4_q4:
+  am_afrimgsm: 0.216
+  en_afrimgsm: 0.356
+  am_afrimmlu: 0.212
+  en_stem_holdout: 0.370
+  tutoring: 0.921
