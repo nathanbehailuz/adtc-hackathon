@@ -20,7 +20,7 @@ set -u
 
 MIX="${ADTC_ROOT}/data/train/sft_mix_v6.jsonl"
 CONFIG="${ADTC_ROOT}/training/configs/qlora_qwen3_1_7b_v6.yaml"
-[[ -f "${MIX}" ]] || { echo "missing ${MIX} — run 02h_prepare_mix_v6.sbatch first" >&2; exit 1; }
+[[ -f "${MIX}" ]] || { echo "missing ${MIX} — run prepare_mix.sbatch first" >&2; exit 1; }
 [[ -f "${CONFIG}" ]] || { echo "missing ${CONFIG}" >&2; exit 1; }
 
 cd "${ADTC_ROOT}/training"

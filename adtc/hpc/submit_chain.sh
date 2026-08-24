@@ -1,79 +1,36 @@
 #!/usr/bin/env bash
-# Submit the default Jubail chain with afterok dependencies.
-# Run from a login node (not on compute):
-#   cd /scratch/nz2212/adtc-hackathon/adtc/hpc && bash submit_chain.sh
-#
-# Env vars:
-#   SKIP_SETUP=1  — skip setup_env.sbatch if conda env already exists
-#   CHAIN_FROM=N  — start from stage N (1=download_train … 5=merge); implies SKIP_SETUP
+# English-only Qwen3-1.7B: SFT → merge → GGUF → eval → profile.
+# Usage (from adtc/hpc):
+#   bash submit_chain.sh
 set -euo pipefail
-
-HPC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "${HPC_DIR}"
+cd "$(dirname "$0")"
 mkdir -p logs
 
-SKIP_SETUP="${SKIP_SETUP:-0}"
-CHAIN_FROM="${CHAIN_FROM:-0}"
-if [[ "${CHAIN_FROM}" != "0" ]]; then
-  SKIP_SETUP=1
-fi
+J_PREP=$(sbatch --parsable prepare_mix.sbatch)
+echo "prep ${J_PREP}"
 
-submit() {
-  local script="$1"
-  shift
-  sbatch --parsable "$@" "${script}"
-}
+J_SFT=$(sbatch --parsable --dependency=afterok:"${J_PREP}" train_sft.sbatch)
+echo "sft ${J_SFT}"
 
-PREV=""
-if [[ "${SKIP_SETUP}" != "1" ]]; then
-  PREV="$(submit setup_env.sbatch)"
-  echo "submitted setup_env.sbatch → ${PREV}"
-fi
+J_MERGE=$(sbatch --parsable --dependency=afterok:"${J_SFT}" merge_lora.sbatch)
+echo "merge ${J_MERGE}"
 
-stage_ge() {
-  local n="$1"
-  [[ "${CHAIN_FROM}" == "0" || "${CHAIN_FROM}" -le "${n}" ]]
-}
+J_GGUF=$(sbatch --parsable --dependency=afterok:"${J_MERGE}" convert_gguf.sbatch)
+echo "gguf ${J_GGUF}"
 
-dep_flag() {
-  if [[ -n "${PREV}" ]]; then
-    echo "--dependency=afterok:${PREV}"
-  fi
-}
+J_HF=$(sbatch --parsable --dependency=afterok:"${J_MERGE}" eval_hf.sbatch)
+echo "eval_hf ${J_HF}"
 
-if stage_ge 1; then
-  # shellcheck disable=SC2046
-  PREV="$(submit 01_download_train.sbatch $(dep_flag))"
-  echo "submitted 01_download_train.sbatch → ${PREV}"
-fi
+J_Q4=$(sbatch --parsable --export=ALL,V6_QUANT=Q4_K_M --dependency=afterok:"${J_GGUF}" eval_gguf.sbatch)
+echo "eval_gguf_q4 ${J_Q4}"
 
-if stage_ge 2; then
-  # shellcheck disable=SC2046
-  PREV="$(submit 02_prepare_data.sbatch $(dep_flag))"
-  echo "submitted 02_prepare_data.sbatch → ${PREV}"
-fi
+J_Q5=$(sbatch --parsable --export=ALL,V6_QUANT=Q5_K_M --dependency=afterok:"${J_GGUF}" eval_gguf.sbatch)
+echo "eval_gguf_q5 ${J_Q5}"
 
-if stage_ge 3; then
-  # shellcheck disable=SC2046
-  PREV="$(submit 03_download_models.sbatch $(dep_flag))"
-  echo "submitted 03_download_models.sbatch → ${PREV}"
-fi
+J_PROF=$(sbatch --parsable --dependency=afterok:"${J_GGUF}" profile_gguf.sbatch)
+echo "profile ${J_PROF}"
 
-if stage_ge 4; then
-  # shellcheck disable=SC2046
-  PREV="$(submit 04_train_sft_1_7b.sbatch $(dep_flag))"
-  echo "submitted 04_train_sft_1_7b.sbatch → ${PREV}"
-fi
-
-if stage_ge 5; then
-  # shellcheck disable=SC2046
-  PREV="$(submit 05_merge_lora.sbatch $(dep_flag))"
-  echo "submitted 05_merge_lora.sbatch → ${PREV}"
-fi
-
-echo
-echo "Monitor:  squeue -u \$USER"
-echo "Cancel:   scancel <jobid>"
-echo "Slurm logs: ${HPC_DIR}/logs/"
-echo "Stage logs: ${HPC_DIR}/../logs/"
-echo "4B SFT (optional): sbatch 04b_train_sft_4b.sbatch"
+echo "----"
+echo "chain: ${J_PREP}->${J_SFT}->${J_MERGE}->{${J_GGUF}->{${J_Q4},${J_Q5},${J_PROF}},${J_HF}}"
+echo "monitor: squeue -u \$USER"
+echo "artifacts: docs/artifacts/v6/"
