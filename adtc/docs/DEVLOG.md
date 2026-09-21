@@ -932,3 +932,13 @@ Wired v7 QLoRA config, hardened tutor system prompt, and added judge-aligned smo
 ### Next
 1. On AGH: `bash setup_env.sh && bash run_chain.sh` (tmux).
 2. Re-profile Q4/Q5/Q6 with accuracy; pick throughput-friendly quant.
+
+---
+
+## 2026-09-21 — Fix agh/env.sh for Shadeform interactive shells
+
+### Outcome
+`source env.sh` no longer enables `set -e` or `cd`s out of `agh/`, which was killing SSH/tmux sessions on Shadeform A6000. `setup_env.sh` now auto-installs Miniconda if missing.
+
+### Next
+1. On instance: `git pull` then `bash setup_env.sh` from `adtc/agh`.
