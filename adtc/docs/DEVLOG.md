@@ -898,3 +898,19 @@ Added Africa GPU Hub runbook alongside Jubail `hpc/`. v7 train/eval will run on 
 ### Next
 1. Ship `mix_sft_v7.py` + authored tutoring bank (format leak + scaffolding).
 2. Add `qlora_qwen3_1_7b_v7.yaml` and run chain on AGH.
+
+---
+
+## 2026-09-21 — SFT mix v7 (markup strip + authored tutoring)
+
+### Outcome
+Added `mix_sft_v7.py` and authored tutoring bank to fix Round-1 GSM8K `####` leak and thin scaffolding.
+
+### What
+- [`data/mix_sft_v7.py`](../data/mix_sft_v7.py): strip `####` / `<<>>`, richer hint/first_error/explain
+- [`data/build_authored_tutoring_v7.py`](../data/build_authored_tutoring_v7.py) → [`data/authored_tutoring_v7.jsonl`](../data/authored_tutoring_v7.jsonl) (163 rows)
+- Post-build markup assert
+
+### Next
+1. Add `qlora_qwen3_1_7b_v7.yaml` and harden system prompt.
+2. Build mix on AGH and train.
