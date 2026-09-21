@@ -43,6 +43,10 @@ else
   exit 1
 fi
 
+# Recent Miniconda requires explicit ToS acceptance before `conda create`.
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main 2>/dev/null || true
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r 2>/dev/null || true
+
 if [[ ! -d "${CONDA_ENV}" ]]; then
   echo "[setup] Creating conda env at ${CONDA_ENV}"
   conda create -p "${CONDA_ENV}" python=3.11 -y
