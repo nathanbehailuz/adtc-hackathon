@@ -8,6 +8,16 @@ mkdir -p "${AGH_DIR}/logs"
 LOG="${AGH_DIR}/logs/train_sft.log"
 exec > >(tee -a "${LOG}") 2>&1
 
+if [[ ! -d "${CONDA_ENV}" ]]; then
+  echo "error: missing ${CONDA_ENV} — run bash setup_env.sh first" >&2
+  exit 1
+fi
+set +u
+# shellcheck disable=SC1091
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate "${CONDA_ENV}"
+set -u
+
 MIX="${ADTC_ROOT}/data/train/sft_mix_v7.jsonl"
 CONFIG="${ADTC_ROOT}/training/configs/qlora_qwen3_1_7b_v7.yaml"
 [[ -f "${MIX}" ]] || { echo "missing ${MIX} — run prepare_mix.sh first" >&2; exit 1; }

@@ -942,3 +942,13 @@ Wired v7 QLoRA config, hardened tutor system prompt, and added judge-aligned smo
 
 ### Next
 1. On instance: `git pull` then `bash setup_env.sh` from `adtc/agh`.
+
+---
+
+## 2026-09-21 — download_models requires training conda env
+
+### Outcome
+Shadeform download failed on base Miniconda (no `huggingface_hub`). Scripts now refuse to run until `setup_env.sh` has created `training/.conda-env`.
+
+### Next
+On instance: `git pull && bash setup_env.sh` (wait for Done), then `bash download_models.sh`.
