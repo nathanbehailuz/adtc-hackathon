@@ -35,6 +35,7 @@ V7_QUANT=Q4_K_M run_stage eval_gguf_q4 eval_gguf.sh
 V7_QUANT=Q5_K_M run_stage eval_gguf_q5 eval_gguf.sh
 
 run_stage profile_gguf profile_gguf.sh
+run_stage judge_smoke judge_smoke.sh
 
 echo "----"
 echo "v7 chain complete. Artifacts: docs/artifacts/v7/"

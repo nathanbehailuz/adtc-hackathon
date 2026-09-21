@@ -33,11 +33,12 @@ python chat.py
 
 ```
 adtc/
-  docs/          PRD, datasets, tooling, v6 results
-  data/          mix_sft_v6.py + frozen eval (data/eval/)
+  docs/          PRD, datasets, tooling, results
+  data/          mix_sft_v7.py + authored tutoring + frozen eval
   training/      QLoRA SFT / merge (HF checkpoints)
-  hpc/           Jubail Slurm jobs (scratch + A100)
-  eval/          HF/GGUF eval, try_prompt, submission staging
+  agh/           Africa GPU Hub runbook (preferred for v7)
+  hpc/           Jubail Slurm jobs (legacy)
+  eval/          HF/GGUF eval, judge smoke, try_prompt
 adtc-2026-submission-template/   Gate packaging + chat.py demo
 ```
 
@@ -46,7 +47,8 @@ adtc-2026-submission-template/   Gate packaging + chat.py demo
 | Work | Where | How |
 |------|--------|-----|
 | Interactive chat demo | Laptop / compute | [`adtc-2026-submission-template/`](adtc-2026-submission-template/) (`chat.py`) |
-| Train data + QLoRA + merge | **NYUAD Jubail** (`$SCRATCH`) | [`adtc/hpc/README.md`](adtc/hpc/README.md) |
+| Train data + QLoRA + merge | **Africa GPU Hub** | [`adtc/agh/README.md`](adtc/agh/README.md) |
+| Legacy Slurm chain | NYUAD Jubail | [`adtc/hpc/README.md`](adtc/hpc/README.md) |
 | Training details | GPU machine / job | [`adtc/training/README.md`](adtc/training/README.md) |
 | Profiler / GGUF smoke | Laptop or Jubail compute | [`adtc/docs/TOOLING.md`](adtc/docs/TOOLING.md) |
 | Stage OK/FAIL logs | Anywhere | [`adtc/docs/RUNLOGS.md`](adtc/docs/RUNLOGS.md) |

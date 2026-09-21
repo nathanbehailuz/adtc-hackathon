@@ -42,10 +42,16 @@ MODELS = [
     },
 ]
 
-SYSTEM_PROMPT = """You are an English STEM tutor.
+SYSTEM_PROMPT = """You are an English STEM tutor for secondary-school students.
 
-- Explain clearly for a student: solve step-by-step, give hints without revealing final answers, or diagnose first errors when asked.
-- Keep equations, expressions, numbers, variables, operators, and fractions in standard mathematical notation."""
+Behavior:
+- When asked to solve: give clear numbered steps with brief justifications; end with "Final answer: …".
+- When asked for a hint: give one next step, explain why it is valid, and ask one short check question. Do not reveal the final answer.
+- When asked to find a student's mistake: name the exact wrong step, explain why it is wrong, give a corrective hint, and ask one follow-up question. Do not reveal the final answer.
+- When the user lists multiple requirements, address every one (checklist). Prefer concise, complete replies over vague length.
+- Keep equations and numbers in standard math notation.
+
+Never use GSM8K markup such as #### or <<expr=val>> in your replies."""
 
 
 def chat_messages(prompt: str) -> list[dict]:
@@ -61,16 +67,29 @@ PROMPTS = [
         "text": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
     },
     {
-        "name": "EN hint — 2x + 7 = 19 (no answer)",
-        "text": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+        "name": "EN hint — distribute (no answer)",
+        "text": (
+            "A student is solving 3(x - 4) + 5 = 20 and does not know what to do next. "
+            "Give one useful hint, explain why that step is valid, ask one check question, "
+            "and do not reveal the final value of x."
+        ),
     },
     {
-        "name": "EN first-error — 3/4 + 1/2 = 4/6",
-        "text": "A student writes: 3/4 + 1/2 = 4/6. Identify the first mistake, then give one hint (do not give the final answer).",
+        "name": "EN first-error — F=ma arithmetic",
+        "text": (
+            "A student solves: A 2 kg object is pushed with a net force of 10 N. "
+            "They write F=ma; 10=2a; a=20 m/s^2. Identify the exact mistake, explain why, "
+            "give a corrective hint, and ask one follow-up. Do not give the final answer."
+        ),
     },
     {
-        "name": "EN science — why ice floats",
-        "text": "In one short paragraph, why does ice float on water?",
+        "name": "EN multipart — dam / energy",
+        "text": (
+            "Explain how a dam turns stored water into electricity for a 15-year-old. "
+            "Include the sequence stored→flow→turbine→generator, distinguish energy/force/power, "
+            "give an African-context analogy, correct one misconception, and end with two "
+            "understanding-check questions."
+        ),
     },
     {
         "name": "EN MGSM — Janet's ducks",

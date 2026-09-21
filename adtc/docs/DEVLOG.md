@@ -914,3 +914,21 @@ Added `mix_sft_v7.py` and authored tutoring bank to fix Round-1 GSM8K `####` lea
 ### Next
 1. Add `qlora_qwen3_1_7b_v7.yaml` and harden system prompt.
 2. Build mix on AGH and train.
+
+---
+
+## 2026-09-21 — v7 train config + judge smoke + AGH docs
+
+### Outcome
+Wired v7 QLoRA config, hardened tutor system prompt, and added judge-aligned smoke eval for AGH runs.
+
+### What
+- [`training/configs/qlora_qwen3_1_7b_v7.yaml`](../training/configs/qlora_qwen3_1_7b_v7.yaml): 2 epochs, LoRA r=32/α=64
+- [`eval/try_prompt.py`](../eval/try_prompt.py): no-`####` system policy + richer smoke prompts
+- [`eval/run_judge_smoke.py`](../eval/run_judge_smoke.py) + [`data/eval/judge_smoke_v7.jsonl`](../data/eval/judge_smoke_v7.jsonl)
+- [`agh/judge_smoke.sh`](../agh/judge_smoke.sh) hooked into `run_chain.sh`
+- Root README points train/eval at Africa GPU Hub
+
+### Next
+1. On AGH: `bash setup_env.sh && bash run_chain.sh` (tmux).
+2. Re-profile Q4/Q5/Q6 with accuracy; pick throughput-friendly quant.

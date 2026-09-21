@@ -79,6 +79,7 @@ Or run stages one at a time:
 | `eval_hf.sh` | Frozen HF eval |
 | `eval_gguf.sh` | GGUF eval (`V7_QUANT=Q4_K_M` etc.) |
 | `profile_gguf.sh` | Profiler / Gate 5 pick |
+| `judge_smoke.sh` | Format-leak + multi-part tutoring checklist |
 | `try_prompt.sh` | Qualitative smoke |
 | `run_chain.sh` | Sequential fail-fast chain |
 
