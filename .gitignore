@@ -22,4 +22,8 @@ __pycache__/
 adtc/training/.conda-env/
 adtc/hpc/logs/*
 !adtc/hpc/logs/.gitkeep
+adtc/agh/logs/*
+!adtc/agh/logs/.gitkeep
+adtc/agh/.agh-work/
+adtc/.agh-work/
 adtc/.env

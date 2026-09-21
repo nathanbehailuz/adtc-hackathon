@@ -882,3 +882,19 @@ Rewrote [`adtc-2026-submission-template/REPORT.md`](../../adtc-2026-submission-t
 ### Next
 1. Submit when Devpost fields + public repo are ready.
 
+
+---
+
+## 2026-09-21 — AGH Cloud runbook (`adtc/agh/`)
+
+### Outcome
+Added Africa GPU Hub runbook alongside Jubail `hpc/`. v7 train/eval will run on [aghcloud.ai](https://aghcloud.ai/) container instances (tmux), not Slurm.
+
+### What
+- New [`adtc/agh/`](../agh/): `README.md`, `env.sh`, stage scripts, `run_chain.sh`
+- Paths: `/root/gpuhub-tmp` for WORK caches; `/root/autodl-fs` for durable repo
+- `.gitignore` covers `adtc/agh/logs/*`
+
+### Next
+1. Ship `mix_sft_v7.py` + authored tutoring bank (format leak + scaffolding).
+2. Add `qlora_qwen3_1_7b_v7.yaml` and run chain on AGH.
