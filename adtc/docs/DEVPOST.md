@@ -27,8 +27,8 @@ TebebAI is a **tutor, not an answer lookup tool**. It is trained around four beh
 
 Example prompts:
 
-* Triangle first-error (base 10, height 4, student says area is 40) — diagnose, hint, no numeric dump.
-* Betty’s $100 wallet — one hint + why + check question, no dollar total.
+* Triangle with base 10 and height 4, student says area is 40 — first mistake + one hint, no final number.
+* Betty needs $100; she has half; parents $15; grandparents twice that — one hint, no dollar total.
 
 The model is one **GGUF file** (~1.1 GB at Q4_K_M). After `download_model.sh`, it runs locally through `llama.cpp` or `python chat.py`. No API keys, no cloud calls, no model router.
 

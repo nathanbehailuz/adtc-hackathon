@@ -1243,3 +1243,20 @@ Re-checked [`GATE2_PLACEMENT_CHECKLIST.md`](GATE2_PLACEMENT_CHECKLIST.md) vs liv
 ### Next
 1. Push submission + parent repos.
 2. Record ≤2 min video; paste DEVPOST.md.
+
+---
+
+## 2026-09-22 — Simplified metadata test_prompts
+
+### Outcome
+Shortened `test_prompts` and re-ran `python3 chat.py --from-metadata` on local v7 Q4. Both stay on-policy (no final 20, no Betty total).
+
+### What
+- tp_001: triangle 10×4=40 first-error + “Do not give the final number.” Names missing ÷2.
+- tp_002: one-line Betty wallet hint. Starts at 15×2; no $.
+- Bare triangle without the last sentence **mis-diagnosed** (treated 10×4=40 as correct).
+- Log: `adtc/logs/try_prompt/v7_q4_simple_test_prompts.log`
+
+### Next
+1. Commit + push submission `metadata.json` / REPORT if keeping these prompts.
+2. Demo video with the short versions.

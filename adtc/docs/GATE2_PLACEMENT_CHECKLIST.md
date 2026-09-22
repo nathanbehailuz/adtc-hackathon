@@ -44,7 +44,7 @@ adtc-2026-submission-template/
 | Check | Status | Notes |
 |-------|--------|-------|
 | Identity / domain / submitter | **PASS** | TebebAI / math_scientific_reasoning |
-| Exactly **2** `test_prompts` | **PASS** | tp_001 triangle first-error; tp_002 Betty hint (on-policy laptop smoke) |
+| Exactly **2** `test_prompts` | **PASS** | short triangle first-error + short Betty hint (laptop smoke OK) |
 | `model.runtime` = `llama.cpp` | **PASS** | |
 | `_runtime.model_path` | **PASS** | `model/tebeb_tutor_1.7b-Q4_K_M.gguf` |
 | **No** `git_commit_sha` key | **PASS** | |

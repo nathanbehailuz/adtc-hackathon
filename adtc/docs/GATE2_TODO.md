@@ -213,7 +213,7 @@ Upload to Devpost (and YouTube/unlisted if useful).
 | HF frozen eval v7 | Done (EN MGSM 0.444, EN STEM 0.47) |
 | Q4 GGUF eval | Done; Q4 is deploy pick |
 | Q5 / judge_smoke | Done (Q5 eval + judge_smoke JSON in `docs/artifacts/v7/`) |
-| Submission template (local) | `metadata.json` test_prompts = triangle first-error + Betty hint; REPORT + provenance tidy |
+| Submission template (local) | shorter `test_prompts` (triangle + Betty); GitHub `d621257` |
 | `provenance/` | On GitHub `9caa7ca`; this revision adds licenses, `train_loss=0.6026`, mixed sample, GGUF SHA (no TBD) |
 | GitHub fork | Pushed `b3ca790` — on-policy test_prompts + provenance tidy |
 | Remaining ops | Video, Devpost paste, diligence call, optional HF re-download smoke |
