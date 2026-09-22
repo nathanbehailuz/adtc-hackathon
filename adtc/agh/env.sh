@@ -67,6 +67,16 @@ export OPENBLAS_NUM_THREADS="${OMP_NUM_THREADS}"
 export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
 
+# Pinned llama.cpp b10451 binaries on PATH (gitignored under tools/).
+# Do NOT put them on LD_LIBRARY_PATH here — that shadows llama-cpp-python's
+# bundled libllama and breaks GGUF load in eval/try_prompt/judge_smoke.
+# convert_gguf.sh / profile_gguf.sh set LD_LIBRARY_PATH only for native tools.
+_LLAMA_BIN="${ADTC_ROOT}/tools/llama.cpp/llama-b10451"
+if [[ -d "${_LLAMA_BIN}" ]]; then
+  export PATH="${_LLAMA_BIN}:${PATH}"
+fi
+unset _LLAMA_BIN
+
 if [[ -n "${MINICONDA_ACTIVATE:-}" && -f "${MINICONDA_ACTIVATE}" ]]; then
   # shellcheck disable=SC1090
   source "${MINICONDA_ACTIVATE}"
@@ -98,4 +108,7 @@ else
 fi
 if command -v python >/dev/null 2>&1; then
   echo "[env] python=$(command -v python) ($(python -V 2>&1))"
+fi
+if command -v llama-quantize >/dev/null 2>&1; then
+  echo "[env] llama-quantize=$(command -v llama-quantize)"
 fi

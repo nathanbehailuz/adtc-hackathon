@@ -61,6 +61,7 @@ tmux new -s adtc
 cd /root/autodl-fs/adtc-hackathon/adtc/agh
 source env.sh
 bash setup_env.sh
+bash setup_llama_cpp.sh   # llama.cpp b10451 convert + llama-quantize
 bash download_models.sh
 # Full chain (prep → SFT → merge → GGUF → eval → profile):
 bash run_chain.sh
@@ -71,6 +72,7 @@ Or run stages one at a time:
 | Script | Role |
 |--------|------|
 | `setup_env.sh` | Conda env + CUDA torch + training requirements |
+| `setup_llama_cpp.sh` | llama.cpp **b10451** source + `llama-quantize` / `llama-bench` |
 | `download_models.sh` | `Qwen/Qwen3-1.7B` into `HF_HOME` |
 | `prepare_mix.sh` | Build `sft_mix_v7.jsonl` |
 | `train_sft.sh` | QLoRA SFT (GPU) |
@@ -84,6 +86,15 @@ Or run stages one at a time:
 | `run_chain.sh` | Sequential fail-fast chain |
 
 Logs: `adtc/agh/logs/<stage>.log`.
+
+Resume after a failed convert (merged HF already on disk):
+
+```bash
+cd ~/adtc-hackathon/adtc/agh   # or /root/autodl-fs/adtc-hackathon/adtc/agh
+git pull
+START_STAGE=convert_gguf bash run_chain.sh
+# or just: bash convert_gguf.sh
+```
 
 ## Secrets
 

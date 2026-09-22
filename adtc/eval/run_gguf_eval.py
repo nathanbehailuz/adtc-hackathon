@@ -82,22 +82,32 @@ def take(rows: list, limit: int | None) -> list:
     return rows[:limit]
 
 
-def score_qa(llm, rows: list[dict], limit: int | None) -> dict:
+def _tick(name: str, i: int, n: int) -> None:
+    if i == 1 or i == n or i % 25 == 0:
+        print(f"[{name}] {i}/{n}", flush=True)
+
+
+def score_qa(llm, rows: list[dict], limit: int | None, name: str = "qa") -> dict:
     rows = take(rows, limit)
     ok = 0
-    for r in rows:
+    n = len(rows)
+    print(f"[{name}] start n={n}", flush=True)
+    for i, r in enumerate(rows, start=1):
         pred = normalize_ans(gen(llm, r["question"]))
         gold = normalize_ans(gold_answer(r))
         ok += int(bool(gold) and pred == gold)
-    n = max(1, len(rows))
+        _tick(name, i, n)
+    n = max(1, n)
     return {"n": len(rows), "correct": ok, "acc": ok / n}
 
 
-def score_mmlu(llm, rows: list[dict], limit: int | None) -> dict:
+def score_mmlu(llm, rows: list[dict], limit: int | None, name: str = "mmlu") -> dict:
     rows = take(rows, limit)
     ok = 0
     letters = ["A", "B", "C", "D"]
-    for r in rows:
+    n = len(rows)
+    print(f"[{name}] start n={n}", flush=True)
+    for i, r in enumerate(rows, start=1):
         ex = r.get("example") or r
         q = ex["question"]
         choices = ex.get("choices") or []
@@ -109,15 +119,18 @@ def score_mmlu(llm, rows: list[dict], limit: int | None) -> dict:
         if gold.isdigit():
             gold = letters[int(gold)] if int(gold) < 4 else gold
         ok += int(bool(gold) and letter == gold[0])
-    n = max(1, len(rows))
+        _tick(name, i, n)
+    n = max(1, n)
     return {"n": len(rows), "correct": ok, "acc": ok / n}
 
 
-def score_tutoring(llm, rows: list[dict], limit: int | None) -> dict:
+def score_tutoring(llm, rows: list[dict], limit: int | None, name: str = "tutoring") -> dict:
     rows = take(rows, limit)
     ok = 0
     samples = []
-    for r in rows:
+    n = len(rows)
+    print(f"[{name}] start n={n}", flush=True)
+    for i, r in enumerate(rows, start=1):
         msgs = r.get("messages") or []
         user = next((m["content"] for m in msgs if m["role"] == "user"), None)
         if not user:
@@ -127,7 +140,8 @@ def score_tutoring(llm, rows: list[dict], limit: int | None) -> dict:
         ok += int(hit)
         if len(samples) < 3:
             samples.append({"prompt": user[:120], "pred": pred[:200]})
-    n = max(1, len(rows))
+        _tick(name, i, n)
+    n = max(1, n)
     return {"n": len(rows), "correct": ok, "acc": ok / n, "samples": samples}
 
 
@@ -149,16 +163,18 @@ def main() -> None:
         raise SystemExit(f"GGUF not found: {gguf}")
 
     llm = make_llm(gguf, n_threads=args.n_threads)
+    # EN-only track: skip AfriMGSM/MMLU Amharic (saves ~750 CPU gens).
+    print(f"loaded {gguf} — scoring EN frozen suites only", flush=True)
     eval_dir = ROOT / "data" / "eval"
     suites: dict = {}
-    suites["afrimgsm_amh"] = score_qa(llm, load_jsonl(eval_dir / "afrimgsm_amh_test_v0.jsonl"), args.limit)
-    suites["afrimgsm_eng"] = score_qa(llm, load_jsonl(eval_dir / "afrimgsm_eng_test_v0.jsonl"), args.limit)
-    mmlu = eval_dir / "afrimmlu_amh_test_v0.jsonl"
-    if mmlu.exists():
-        suites["afrimmlu_amh"] = score_mmlu(llm, load_jsonl(mmlu), args.limit)
-    suites["en_stem_holdout"] = score_qa(llm, load_jsonl(eval_dir / "en_stem_holdout_v0.jsonl"), args.limit)
+    suites["afrimgsm_eng"] = score_qa(
+        llm, load_jsonl(eval_dir / "afrimgsm_eng_test_v0.jsonl"), args.limit, name="afrimgsm_eng"
+    )
+    suites["en_stem_holdout"] = score_qa(
+        llm, load_jsonl(eval_dir / "en_stem_holdout_v0.jsonl"), args.limit, name="en_stem_holdout"
+    )
     suites["custom_tutoring"] = score_tutoring(
-        llm, load_jsonl(eval_dir / "custom_tutoring_v0.jsonl"), args.limit
+        llm, load_jsonl(eval_dir / "custom_tutoring_v0.jsonl"), args.limit, name="custom_tutoring"
     )
 
     report = {

@@ -14,5 +14,9 @@ GGUF="${ADTC_ROOT}/artifacts/gguf/adapted/qwen3_1_7b_merged_v7-${QUANT}.gguf"
 [[ -f "${GGUF}" ]] || { echo "missing ${GGUF}" >&2; exit 1; }
 OUT="docs/artifacts/v7/qwen3_1_7b_merged_v7-${QUANT}_eval.json"
 NTHREADS="${NTHREADS:-${OMP_NUM_THREADS:-8}}"
+# Clear native llama.cpp libs so llama-cpp-python uses its own shared objects.
+export LD_LIBRARY_PATH="$(
+  printf '%s' "${LD_LIBRARY_PATH:-}" | tr ':' '\n' | grep -v '/tools/llama.cpp/llama-b10451' | paste -sd: - || true
+)"
 python eval/run_gguf_eval.py --gguf "${GGUF}" --n-threads "${NTHREADS}" --out "${OUT}"
 echo "[eval_gguf_v7] OK ${OUT}"

@@ -82,22 +82,32 @@ def take(rows: list, limit: int | None) -> list:
     return rows[:limit]
 
 
-def score_qa(model, tok, rows: list[dict], qkey: str, akey: str, limit: int | None) -> dict:
+def _tick(name: str, i: int, n: int) -> None:
+    if i == 1 or i == n or i % 25 == 0:
+        print(f"[{name}] {i}/{n}", flush=True)
+
+
+def score_qa(model, tok, rows: list[dict], qkey: str, akey: str, limit: int | None, name: str = "qa") -> dict:
     rows = take(rows, limit)
     ok = 0
-    for r in rows:
+    n = len(rows)
+    print(f"[{name}] start n={n}", flush=True)
+    for i, r in enumerate(rows, start=1):
         pred = normalize_ans(gen(model, tok, r[qkey]))
         gold = normalize_ans(gold_answer(r) if akey == "answer" else str(r.get(akey, "")))
         ok += int(bool(gold) and pred == gold)
-    n = max(1, len(rows))
+        _tick(name, i, n)
+    n = max(1, n)
     return {"n": len(rows), "correct": ok, "acc": ok / n}
 
 
-def score_mmlu(model, tok, rows: list[dict], limit: int | None) -> dict:
+def score_mmlu(model, tok, rows: list[dict], limit: int | None, name: str = "mmlu") -> dict:
     rows = take(rows, limit)
     ok = 0
     letters = ["A", "B", "C", "D"]
-    for r in rows:
+    n = len(rows)
+    print(f"[{name}] start n={n}", flush=True)
+    for i, r in enumerate(rows, start=1):
         ex = r.get("example") or r
         q = ex["question"]
         choices = ex.get("choices") or []
@@ -109,16 +119,19 @@ def score_mmlu(model, tok, rows: list[dict], limit: int | None) -> dict:
         if gold.isdigit():
             gold = letters[int(gold)] if int(gold) < 4 else gold
         ok += int(letter == gold[0] if gold else False)
-    n = max(1, len(rows))
+        _tick(name, i, n)
+    n = max(1, n)
     return {"n": len(rows), "correct": ok, "acc": ok / n}
 
 
-def score_tutoring(model, tok, rows: list[dict], limit: int | None) -> dict:
+def score_tutoring(model, tok, rows: list[dict], limit: int | None, name: str = "tutoring") -> dict:
     """Soft pass if the model produces a non-empty reply (len>20)."""
     rows = take(rows, limit)
     ok = 0
     samples = []
-    for r in rows:
+    n = len(rows)
+    print(f"[{name}] start n={n}", flush=True)
+    for i, r in enumerate(rows, start=1):
         msgs = r.get("messages") or []
         user = next((m["content"] for m in msgs if m["role"] == "user"), None)
         if not user:
@@ -128,7 +141,8 @@ def score_tutoring(model, tok, rows: list[dict], limit: int | None) -> dict:
         ok += int(hit)
         if len(samples) < 3:
             samples.append({"prompt": user[:120], "pred": pred[:200]})
-    n = max(1, len(rows))
+        _tick(name, i, n)
+    n = max(1, n)
     return {"n": len(rows), "correct": ok, "acc": ok / n, "samples": samples}
 
 
@@ -156,29 +170,32 @@ def main() -> None:
     )
     if not torch.cuda.is_available():
         model = model.to("cpu")
+    print(
+        f"loaded {args.model} cuda={torch.cuda.is_available()} "
+        f"(EN suites only; first CUDA generate can take 1–2 min)",
+        flush=True,
+    )
 
     eval_dir = ROOT / "data" / "eval"
-    report = {"model": args.model, "limit": args.limit, "suites": {}}
+    report = {"model": args.model, "limit": args.limit, "suites": {}, "lang_scope": "en"}
 
-    am = load_jsonl(eval_dir / "afrimgsm_amh_test_v0.jsonl")
     en = load_jsonl(eval_dir / "afrimgsm_eng_test_v0.jsonl")
-    report["suites"]["afrimgsm_amh"] = score_qa(model, tok, am, "question", "answer", args.limit)
-    report["suites"]["afrimgsm_eng"] = score_qa(model, tok, en, "question", "answer", args.limit)
-
-    mmlu_path = eval_dir / "afrimmlu_amh_test_v0.jsonl"
-    if mmlu_path.exists():
-        report["suites"]["afrimmlu_amh"] = score_mmlu(model, tok, load_jsonl(mmlu_path), args.limit)
+    report["suites"]["afrimgsm_eng"] = score_qa(
+        model, tok, en, "question", "answer", args.limit, name="afrimgsm_eng"
+    )
 
     hold = load_jsonl(eval_dir / "en_stem_holdout_v0.jsonl")
-    report["suites"]["en_stem_holdout"] = score_qa(model, tok, hold, "question", "answer", args.limit)
+    report["suites"]["en_stem_holdout"] = score_qa(
+        model, tok, hold, "question", "answer", args.limit, name="en_stem_holdout"
+    )
 
     tut = load_jsonl(eval_dir / "custom_tutoring_v0.jsonl")
-    report["suites"]["custom_tutoring"] = score_tutoring(model, tok, tut, args.limit)
+    report["suites"]["custom_tutoring"] = score_tutoring(
+        model, tok, tut, args.limit, name="custom_tutoring"
+    )
 
-    # forget proxy: EN holdout vs AM MGSM gap note
     report["forget_proxy"] = {
         "en_stem_acc": report["suites"]["en_stem_holdout"]["acc"],
-        "am_mgsm_acc": report["suites"]["afrimgsm_amh"]["acc"],
     }
 
     args.out.parent.mkdir(parents=True, exist_ok=True)

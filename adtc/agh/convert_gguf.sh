@@ -13,6 +13,7 @@ export ADTC_ROOT
 
 # Prefer repo-bundled llama.cpp convert if present; else require CONVERT_HF_TO_GGUF.
 LLAMA_SRC="${ADTC_ROOT}/tools/llama.cpp/src-b10451"
+LLAMA_BIN="${ADTC_ROOT}/tools/llama.cpp/llama-b10451"
 CONVERT="${CONVERT_HF_TO_GGUF:-${LLAMA_SRC}/convert_hf_to_gguf.py}"
 OUT_DIR="${ADTC_ROOT}/artifacts/gguf/adapted"
 NAME="qwen3_1_7b_merged_v7"
@@ -20,9 +21,23 @@ HF_DIR="${ADTC_ROOT}/training/runs/${NAME}"
 mkdir -p "${OUT_DIR}" docs/artifacts/v7
 
 [[ -d "${HF_DIR}" ]] || { echo "missing ${HF_DIR}" >&2; exit 1; }
+
+if [[ ! -f "${CONVERT}" ]] || ! command -v llama-quantize >/dev/null 2>&1; then
+  echo "[gguf_v7] llama.cpp missing — running setup_llama_cpp.sh"
+  bash "${AGH_DIR}/setup_llama_cpp.sh"
+  # shellcheck disable=SC1091
+  source "${AGH_DIR}/env.sh"
+  CONVERT="${CONVERT_HF_TO_GGUF:-${LLAMA_SRC}/convert_hf_to_gguf.py}"
+fi
+if [[ -d "${LLAMA_BIN}" ]]; then
+  export PATH="${LLAMA_BIN}:${PATH}"
+  export LD_LIBRARY_PATH="${LLAMA_BIN}:${LD_LIBRARY_PATH:-}"
+fi
+
 [[ -f "${CONVERT}" ]] || {
   echo "missing ${CONVERT}" >&2
-  echo "  Clone/build llama.cpp under tools/ or set CONVERT_HF_TO_GGUF" >&2
+  echo "  Run: bash ${AGH_DIR}/setup_llama_cpp.sh" >&2
+  echo "  Or set CONVERT_HF_TO_GGUF to convert_hf_to_gguf.py" >&2
   exit 1
 }
 python -m pip install -q 'gguf>=0.10' sentencepiece protobuf || true
@@ -37,7 +52,7 @@ fi
 
 if ! command -v llama-quantize >/dev/null 2>&1; then
   echo "error: llama-quantize not on PATH" >&2
-  echo "  Build llama.cpp binaries or add them to PATH" >&2
+  echo "  Run: bash ${AGH_DIR}/setup_llama_cpp.sh" >&2
   exit 1
 fi
 

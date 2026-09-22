@@ -18,5 +18,8 @@ GGUF="${ADTC_ROOT}/artifacts/gguf/adapted/qwen3_1_7b_merged_v7-${QUANT}.gguf"
 }
 OUT="docs/artifacts/v7/judge_smoke_${QUANT}.json"
 NTHREADS="${NTHREADS:-${OMP_NUM_THREADS:-8}}"
+export LD_LIBRARY_PATH="$(
+  printf '%s' "${LD_LIBRARY_PATH:-}" | tr ':' '\n' | grep -v '/tools/llama.cpp/llama-b10451' | paste -sd: - || true
+)"
 python eval/run_judge_smoke.py --gguf "${GGUF}" --n-threads "${NTHREADS}" --out "${OUT}"
 echo "[judge_smoke] OK ${OUT}"

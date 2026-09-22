@@ -83,7 +83,7 @@ python merge_lora.py \
   --out runs/qwen3_1_7b_merged_v7
 ```
 
-On AGH, `agh/convert_gguf.sh` converts merged HF → GGUF quants.  
+On AGH, `agh/convert_gguf.sh` converts merged HF → GGUF quants (installs llama.cpp **b10451** via `agh/setup_llama_cpp.sh` if missing).  
 Candidate deploy: `artifacts/gguf/adapted/qwen3_1_7b_merged_v7-Q4_K_M.gguf` or `Q5_K_M` after profiler pick.
 
 ## Eval

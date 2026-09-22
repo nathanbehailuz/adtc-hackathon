@@ -47,6 +47,9 @@ if [[ -n "${TEXT}" ]]; then
 fi
 
 echo "[try_prompt] model=${MODEL} prompt=${PROMPT} prompts=${PROMPTS:-} out=${OUT_LOG}"
+export LD_LIBRARY_PATH="$(
+  printf '%s' "${LD_LIBRARY_PATH:-}" | tr ':' '\n' | grep -v '/tools/llama.cpp/llama-b10451' | paste -sd: - || true
+)"
 python eval/try_prompt.py "${PY_ARGS[@]}"
 cp -f "${OUT_LOG}" "${LOG_DIR}/latest.log"
 echo "[try_prompt] wrote ${OUT_LOG}"

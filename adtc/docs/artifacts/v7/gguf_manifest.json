@@ -1,0 +1,26 @@
+{
+  "name": "qwen3_1_7b_merged_v7",
+  "files": {
+    "qwen3_1_7b_merged_v7-Q4_K_M.gguf": {
+      "bytes": 1107408576,
+      "sha256": "0c00f7a51e19c0a67a01a02a596ead98625ee4e14277601d8dd117eb18d72b53"
+    },
+    "qwen3_1_7b_merged_v7-Q5_K_M.gguf": {
+      "bytes": 1257879232,
+      "sha256": "f2bd60fa6a32655dc70017c12eb8eae3b43164c80ade3202ec90737f97db3797"
+    },
+    "qwen3_1_7b_merged_v7-Q6_K.gguf": {
+      "bytes": 1417754304,
+      "sha256": "e10fca488433338eff194a1970f2f349fe0a8fe75b6b59dc28f8466b050da5e8"
+    },
+    "qwen3_1_7b_merged_v7-Q8_0.gguf": {
+      "bytes": 1834426048,
+      "sha256": "97290ff89fd4d604436054ca9ef247ab53769ec4655bfa362ec034bf62df758f"
+    },
+    "qwen3_1_7b_merged_v7-f16.gguf": {
+      "bytes": 3447348928,
+      "sha256": "ec5c8fb49092a96a5dacd809651cdd6deeafacc6ef2c9ffd1dce37d651de845a"
+    }
+  },
+  "updated": "2026-09-22T11:53:32.059296+00:00"
+}

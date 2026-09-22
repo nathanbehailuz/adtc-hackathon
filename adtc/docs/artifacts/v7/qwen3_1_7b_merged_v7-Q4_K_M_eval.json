@@ -1,0 +1,45 @@
+{
+  "gguf": "/home/shadeform/adtc-hackathon/adtc/artifacts/gguf/adapted/qwen3_1_7b_merged_v7-Q4_K_M.gguf",
+  "limit": null,
+  "frozen_suites": {
+    "afrimgsm_amh": {
+      "n": 250,
+      "correct": 2,
+      "acc": 0.008
+    },
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 107,
+      "acc": 0.428
+    },
+    "afrimmlu_amh": {
+      "n": 500,
+      "correct": 0,
+      "acc": 0.0
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 43,
+      "acc": 0.43
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 101,
+      "acc": 1.0,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "<think>\n\n</think>\n\n1. 3/5 * 120 = 72 liters.\n\nFinal answer: 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "<think>\n\n</think>\n\nMultiplying both sides by the same non-zero number maintains equality because it keeps the same value on each side. For example, if 2x = 8, multiplying both sides by 3 gives 6x = 24"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "<think>\n\n</think>\n\nMultiply both sides by 1 to keep equality.\n\nExplanation: The student is stuck on 2x + 7 = 19. Hint: Multiply both sides by 1 . Why this works: Multiplying both sides by 1 keeps the "
+        }
+      ]
+    }
+  }
+}

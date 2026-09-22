@@ -1,0 +1,35 @@
+{
+  "gguf": "/home/shadeform/adtc-hackathon/adtc/artifacts/gguf/adapted/qwen3_1_7b_merged_v7-Q5_K_M.gguf",
+  "limit": null,
+  "frozen_suites": {
+    "afrimgsm_eng": {
+      "n": 250,
+      "correct": 108,
+      "acc": 0.432
+    },
+    "en_stem_holdout": {
+      "n": 100,
+      "correct": 43,
+      "acc": 0.43
+    },
+    "custom_tutoring": {
+      "n": 101,
+      "correct": 101,
+      "acc": 1.0,
+      "samples": [
+        {
+          "prompt": "Solve: A tank holds 120 liters. It is 3/5 full. How many liters are in the tank?",
+          "pred": "<think>\n\n</think>\n\n1. 3/5 * 120 = 72 liters\n\nFinal answer: 72"
+        },
+        {
+          "prompt": "Explain why multiplying both sides of an equation by the same non-zero number keeps the equality true.",
+          "pred": "<think>\n\n</think>\n\nMultiplying both sides by the same non-zero number preserves equality because it maintains the relationship between the two sides without altering what is balanced. If x/y = a/b the"
+        },
+        {
+          "prompt": "A student is stuck on: 2x + 7 = 19. Give one hint without revealing x.",
+          "pred": "<think>\n\n</think>\n\nHint: subtract 7 from both sides. Why: move the constant term so you can divide by the coefficient of x. Check question: What is left on the left side after that step? Do not give x"
+        }
+      ]
+    }
+  }
+}

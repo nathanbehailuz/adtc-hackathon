@@ -70,6 +70,15 @@ export PATH="$(pwd)/adtc/tools/llama.cpp/llama-b10451:$PATH"
 which llama-bench
 ```
 
+AGH / Shadeform (Ubuntu, no Slurm):
+```bash
+cd adtc/agh && bash setup_llama_cpp.sh
+# fetches src-b10451 (convert_hf_to_gguf.py) + llama-b10451 binaries
+source env.sh
+which llama-quantize llama-bench
+```
+`run_chain.sh` / `convert_gguf.sh` run this automatically if the convert script or `llama-quantize` is missing. `tools/llama.cpp/` is gitignored.
+
 ## Participant smoke command
 
 ```bash

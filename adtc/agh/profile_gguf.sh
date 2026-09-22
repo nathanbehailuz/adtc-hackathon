@@ -11,6 +11,12 @@ exec > >(tee -a "${LOG}") 2>&1
 cd "${ADTC_ROOT}"
 export ADTC_ROOT
 export ACC_LIMIT="${ACC_LIMIT:-50}"
+# Profiler shells out to llama-bench; those shared libs must be findable.
+LLAMA_BIN="${ADTC_ROOT}/tools/llama.cpp/llama-b10451"
+if [[ -d "${LLAMA_BIN}" ]]; then
+  export PATH="${LLAMA_BIN}:${PATH}"
+  export LD_LIBRARY_PATH="${LLAMA_BIN}:${LD_LIBRARY_PATH:-}"
+fi
 
 mkdir -p docs/artifacts/v7 artifacts/profiler_stage/v7
 

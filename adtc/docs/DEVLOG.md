@@ -952,3 +952,294 @@ Shadeform download failed on base Miniconda (no `huggingface_hub`). Scripts now 
 
 ### Next
 On instance: `git pull && bash setup_env.sh` (wait for Done), then `bash download_models.sh`.
+
+---
+
+## 2026-09-22 — v7 SFT+merge OK; convert_gguf blocked on llama.cpp
+
+### Outcome
+Shadeform chain: `train_sft` OK, `merge_lora` OK (`runs/qwen3_1_7b_merged_v7`, log `logs/merge_lora/20260922T095121Z_34d569cb`). `convert_gguf` failed immediately: `tools/llama.cpp/` is gitignored and was never installed on the instance (`missing …/src-b10451/convert_hf_to_gguf.py`).
+
+### What
+- Added [`agh/setup_llama_cpp.sh`](../agh/setup_llama_cpp.sh): fetch llama.cpp **b10451** source + ubuntu-x64 binaries (cmake fallback)
+- `convert_gguf.sh` / `run_chain.sh` auto-run that setup if convert script or `llama-quantize` is missing
+- `env.sh` prepends `tools/llama.cpp/llama-b10451` to `PATH`
+- `START_STAGE=convert_gguf bash run_chain.sh` resumes after merge
+
+### Next
+1. On Shadeform: `git pull` then `START_STAGE=convert_gguf bash run_chain.sh` (tmux).
+2. Confirm GGUF quants under `artifacts/gguf/adapted/` then HF eval + Q4/Q5 eval + profiler.
+
+---
+
+## 2026-09-22 — v7 GGUF convert OK on Shadeform
+
+### Outcome
+`convert_gguf` completed (`failed=0`). Wrote `docs/artifacts/v7/gguf_manifest.json` with **n=5** (f16 + Q8_0 / Q6_K / Q5_K_M / Q4_K_M). Last quantize wall ~26s.
+
+### What
+- Merged HF: `training/runs/qwen3_1_7b_merged_v7`
+- GGUFs: `artifacts/gguf/adapted/qwen3_1_7b_merged_v7-*.gguf`
+
+### Next
+1. `bash eval_hf.sh` then `V7_QUANT=Q4_K_M bash eval_gguf.sh` and `V7_QUANT=Q5_K_M bash eval_gguf.sh` (tmux).
+2. `bash profile_gguf.sh` and `bash judge_smoke.sh`.
+
+---
+
+## 2026-09-22 — v7 HF eval OK; GGUF load fails on llama-cpp-python
+
+### Outcome
+HF frozen eval wrote `docs/artifacts/v7/qwen3_1_7b_merged_v7_hf_eval.json`. GGUF eval aborted: `Failed to load model from file: …/qwen3_1_7b_merged_v7-Q4_K_M.gguf` (likely old `llama-cpp-python` vs Qwen3 / b10451 GGUF).
+
+### What (HF suites)
+| suite | acc |
+|-------|-----|
+| afrimgsm_amh | 0.028 |
+| afrimgsm_eng | 0.444 |
+| afrimmlu_amh | 0.198 |
+| en_stem_holdout | 0.47 |
+| custom_tutoring | 1.0 |
+
+EN STEM / EN MGSM are up vs v6 GGUF table (0.33 / 0.328). Amharic suites still near floor (expected for EN-only SFT).
+
+### Next
+1. On Shadeform: `pip install -U 'llama-cpp-python>=0.3.34'` then retry `V7_QUANT=Q4_K_M bash eval_gguf.sh`.
+2. If still fail: `llama-cli -m …-Q4_K_M.gguf -p hi -n 8` with b10451 binaries to confirm the GGUF itself loads.
+
+---
+
+## 2026-09-22 — GGUF load still fails at llama-cpp-python 0.3.35
+
+### Outcome
+File exists (~1.1G Q4_K_M). `llama-cpp-python==0.3.35` still raises generic `Failed to load model`. `llama-cli` missing from b10451 install (only quantize/bench were built). Need verbose Llama load + `llama-bench` to see the real ggml error.
+
+### Next
+1. `python -c 'from llama_cpp import Llama; Llama("…Q4_K_M.gguf", verbose=True, n_ctx=512)'`
+2. `llama-bench -m …Q4_K_M.gguf -p 16 -n 8` from `tools/llama.cpp/llama-b10451`.
+3. Branch: bench OK → python/wheel mismatch; bench FAIL → re-convert GGUF.
+
+---
+
+## 2026-09-22 — GGUF OK in llama-bench; LD_LIBRARY_PATH broke llama-cpp-python
+
+### Outcome
+`llama-bench` (b10451) loads Q4_K_M fine (~34 tg t/s). Root cause of Python load fail: `env.sh` put `tools/llama.cpp/llama-b10451` on `LD_LIBRARY_PATH`, so `llama-cpp-python` linked against mismatched native libs.
+
+### What
+- `env.sh`: PATH only for llama binaries (no global `LD_LIBRARY_PATH`)
+- `eval_gguf` / `judge_smoke` / `try_prompt`: strip b10451 from `LD_LIBRARY_PATH` before Python
+- `convert_gguf` / `profile_gguf`: still set `LD_LIBRARY_PATH` for native tools
+
+### Next
+1. On Shadeform (no pull required): `LD_LIBRARY_PATH= V7_QUANT=Q4_K_M bash -c 'source env.sh; unset LD_LIBRARY_PATH; cd $ADTC_ROOT; python eval/run_gguf_eval.py …'` or the one-liner below.
+2. Then Q5 eval → profile → judge_smoke.
+
+---
+
+## 2026-09-22 — Gate 2 ordered TODO doc
+
+### Outcome
+Added [`docs/GATE2_TODO.md`](./GATE2_TODO.md): parallel Shadeform track + submission packaging order (template sync, provenance/, metadata, pinned `download_model.sh`, REPORT, video, Devpost). Deadline is today; critical path starts with metadata/provenance while Q4 eval runs.
+
+### Next
+1. Fill TebebAI `metadata.json` + start `provenance/` from Shadeform adapter.
+2. Finish Q4/Q5 eval → upload winner GGUF with commit-pinned URL.
+
+---
+
+## 2026-09-22 — Eval scripts EN-only (drop Amharic suites)
+
+### Outcome
+`run_hf_eval.py` / `run_gguf_eval.py` no longer score AfriMGSM AM or AfriMMLU AM (~750 gens saved on CPU GGUF). Q4 full eval already completed with AM; restart Q5 after syncing this change to Shadeform.
+
+### Next
+1. On Shadeform: update `eval/run_gguf_eval.py`, Ctrl-C any AM-inclusive Q5, restart EN-only Q5.
+
+---
+
+## 2026-09-22 — v7 Q5 EN eval + judge_smoke Q4
+
+### Outcome
+EN-only Q5 GGUF eval: AfriMGSM EN **0.432**, EN STEM **0.43**, tutoring **1.0**. Judge smoke Q4: **`markup_leak_rate=0.0`** (Round-1 `####` leak fixed), `checklist_pass_rate=0.625` (n=8).
+
+### Next
+1. scp GGUFs + adapter + mix + `judge_smoke_Q4_K_M.json` to laptop; shut down Shadeform when pulled.
+2. Fill `provenance/` + pin HF `download_model.sh`; optional Q5 judge_smoke / profiler if time.
+
+---
+
+## 2026-09-22 — Gate 2 packaging: REPORT + provenance + Q4 pick
+
+### Outcome
+Updated submission template for Gate 2 while downloads finish: `metadata.json` / `REPORT.md` / `provenance/*` aligned to **Q4_K_M** deploy, Round-1 `####` before vs judge_smoke after, v6→v7 accuracy table. Adapter + dataset_info + scripts already in `provenance/`.
+
+### Next
+1. Finish GGUF scp (file must be ~1.1 GB complete); `shasum -a 256` → `checksums.sha256`.
+2. Upload to HF; edit **only** `MODEL_FILE` / `MODEL_URL` in `download_model.sh` with commit-pinned URL.
+3. Push submission repo + Devpost video.
+
+---
+
+## 2026-09-22 — HF GGUF pinned in download_model.sh
+
+### Outcome
+Wired Gate 2 download to public [`nz2212/tebebAIv2`](https://huggingface.co/nz2212/tebebAIv2) file `qwen3_1_7b_merged_v7-Q4_K_M.gguf` at commit `58347614c3c7860c126f62fc7bbdb3cd1d15dd65`. Local path remains `model/tebeb_tutor_1.7b-Q4_K_M.gguf` per metadata.
+
+### Next
+1. `bash download_model.sh` smoke in submission template.
+2. Commit/push submission repo; confirm HF repo is **public**.
+
+---
+
+## 2026-09-22 — Gate 2 Track B1–4 packaging (local)
+
+### Outcome
+Filled TebebAI submission fork [`adtc-2026-submission-template/`](../../adtc-2026-submission-template/): real `metadata.json` (domain `math_scientific_reasoning`, EN tutoring prompts, QLoRA provenance, base Hub SHA `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`), `provenance/` with adapter weights + config + train/merge/convert scripts + dataset_info/checksums, and TebebAI `REPORT.md` (benchmarks left TBD until A4). Left `download_model.sh` placeholders untouched (item 5).
+
+### What
+- `team_id`: TebebAI; submitter Nathan Behailu / nz2212@nyu.edu / nathanbehailuz
+- Provisional model: `tebeb_tutor_1.7b-Q5_K_M` → `model/tebeb_tutor_1.7b-Q5_K_M.gguf`
+- Mix checksum: `605184a9505e83b7893ae1205b985c49fbc6c2ddad00819b8fdbb18d395c3b04` (10636 rows; sample only in repo)
+- Adapter SHA256: `c7b799b4f611f648e409c6865fb38fdf243a27f383c49df01c0e96efbd7b5aed`
+
+### Next
+1. Finish A4/A5 → upload winner GGUF → pin `download_model.sh` + GGUF SHA + REPORT benchmarks.
+2. Commit + push submission fork; packaging smoke; video; Devpost.
+
+---
+
+## 2026-09-22 — Track A pull + remaining scripts
+
+### Outcome
+Q5 GGUF eval marked done on Shadeform. Added [`agh/pull_v7_artifacts.sh`](../agh/pull_v7_artifacts.sh) (scp v7 JSON/MD; optional `--with-gguf`) and [`agh/track_a_remaining.sh`](../agh/track_a_remaining.sh) (on-instance A4 `profile_gguf` then A3 `judge_smoke`).
+
+### Next
+1. On laptop: set `SSH_HOST`/`SSH_PORT`, run `bash adtc/agh/pull_v7_artifacts.sh` for Q5 (+Q4/HF) JSON.
+2. On instance tmux: `bash track_a_remaining.sh` → re-pull with `--with-gguf` → A6 shut down.
+
+---
+
+## 2026-09-22 — Local llama-cli smoke on metadata test_prompts (v7 Q4)
+
+### Outcome
+Ran both Gate 2 `metadata.json` `test_prompts` on the local `qwen3_1_7b_merged_v7-Q4_K_M.gguf` (~1.0G) via llama.cpp **b10451** `llama-cli` (Metal, Apple M1, 8 cores). Same English STEM tutor system prompt as `eval/try_prompt.py`, `/no_think`, `--reasoning off`, temp 0, n=256.
+
+### What
+| prompt_id | Behavior | Notes |
+|-----------|----------|-------|
+| tp_001 (3/4 + 1/2 = 4/6 first mistake) | Named adding numerators/denominators; common-denominator hint + check Q | Also leaked **Final answer: 5/4** (violates first-error “do not reveal”) |
+| tp_002 (2x + 7 = 19 hint) | Subtract 7; why + check Q; no x | Matches tutoring policy |
+
+- Log: `adtc/logs/try_prompt/v7_q4_metadata_test_prompts.log`
+- Gen ~14–15 tok/s (laptop Metal; not Standard Laptop / profiler)
+- Q5 GGUF in the same folder is only **6.2M** (partial; do not use)
+
+### Next
+1. Keep Q4 as the demo GGUF; consider tightening first-error prompts if judges penalize answer dumps.
+2. Finish GGUF upload + `download_model.sh` pin.
+
+---
+
+## 2026-09-22 — Restored chat.py; reran metadata prompts
+
+### Outcome
+Official template sync had dropped `chat.py`. Restored [`adtc-2026-submission-template/chat.py`](../../adtc-2026-submission-template/chat.py) + `requirements.txt`. Ran both `metadata.json` `test_prompts` via `python3 chat.py --from-metadata` against a symlink of the local v7 Q4 GGUF.
+
+### What
+- GGUF path: `model/tebeb_tutor_1.7b-Q4_K_M.gguf` → `adtc/artifacts/gguf/adapted/qwen3_1_7b_merged_v7-Q4_K_M.gguf`
+- Backend: llama.cpp **b10451** `llama-cli` (`llama-cpp-python` pip sdist stalled on this laptop)
+- Replies match the earlier llama-cli smoke: tp_001 still dumps **Final answer: 5/4**; tp_002 hint-only
+- Log: `adtc/logs/try_prompt/v7_q4_chat_py_metadata.log`
+
+### Next
+1. Interactive demo: `cd adtc-2026-submission-template && python3 chat.py`
+2. Pin `download_model.sh` once the GGUF is on HF.
+
+---
+
+## 2026-09-22 — Gate 2 placement checklist vs official template
+
+### Outcome
+Audited local `adtc-2026-submission-template/` against the official submission template tree and the Gate 2 Semifinalist PDF. Wrote [`docs/GATE2_PLACEMENT_CHECKLIST.md`](GATE2_PLACEMENT_CHECKLIST.md) with pass/fail. Required files exist locally (`metadata.json`, pinned `download_model.sh`, `REPORT.md`, `provenance/` adapter + scripts). **GitHub fork is still the empty template** (`42521b4`) — provenance is untracked.
+
+### What
+| Check | Result |
+|-------|--------|
+| Official required files on disk | PASS |
+| GGUF not committed; `model/` gitignored | PASS |
+| HF URL static + pinned commit | PASS (`nz2212/tebebAIv2` @ `58347614…`) |
+| GitHub matches local | BLOCKER (not pushed) |
+| REPORT base-vs-FT prompt examples | GAP (v6/R1 vs v7, not stock Qwen3) |
+| Training loss series in `provenance/` | GAP |
+| Dataset licenses in `dataset_info.md` | GAP |
+| Clean `download_model.sh` smoke | GAP (local GGUF is a symlink) |
+
+### Next
+1. Commit + push the submission repo (including `provenance/`).
+2. Close remaining GAPs in the placement checklist before Devpost.
+
+---
+
+## 2026-09-22 — Pushed Gate 2 submission repo to GitHub
+
+### Outcome
+Committed and pushed [`adtc-2026-submission-template`](https://github.com/nathanbehailuz/adtc-2026-submission-template) `9caa7ca` as **nathanbehailuz \<nz2212@nyu.edu\>** (no Cursor co-author). GitHub `main` now has TebebAI `metadata.json`, pinned `download_model.sh`, `REPORT.md`, `chat.py`, and `provenance/` (adapter 66.5 MB — GitHub warned over 50 MB recommended, accepted under 100 MB hard limit).
+
+### What
+- Remote: `42521b4..9caa7ca  HEAD -> main`
+- Working tree in the fork is clean and matches `origin/main`
+
+### Next
+1. Close remaining placement GAPs (base-vs-FT prompts, licenses, checksums tidy-up, download smoke).
+2. Devpost + video.
+
+---
+
+## 2026-09-22 — Rewrote Devpost project description for v7
+
+### Outcome
+Replaced the v6 Devpost copy (Q5_K_M, 10,473 rows, Jubail 2.46 tok/s) with a Gate 2 draft aligned to v7: Q4_K_M deploy (~1.1 GB), 10,636-row mix + 163 authored, LoRA r=32/α=64 / 2 epochs, Round-1 markup-leak fix, frozen EN numbers from `REPORT.md`. Saved at [`docs/DEVPOST.md`](DEVPOST.md). Does **not** claim Standard Laptop profiler TPS.
+
+### What
+- Same Devpost section headings (Inspiration → What's next)
+- Q4 vs Q5 framed as ~1 pp EN accuracy, smaller disk
+- Judge-smoke: markup leak 0.0, checklist 5/8
+- `chat.py` mentioned as current interface, not a future-only item
+
+### Next
+1. Paste into Devpost; record ≤2 min video.
+2. Fill official profiler TPS/RSS when Gate 5 numbers exist.
+
+---
+
+## 2026-09-22 — Training-sample prompt smoke; new metadata test_prompts
+
+### Outcome
+Ran 11 training-sample user turns (authored tutoring + GSM8K sample) on local v7 Q4 via `chat.py`. Most hint/first-error replies were good then leaked `Final answer`. **Two stayed on-policy.** Those are now `metadata.json` `test_prompts`.
+
+### What
+| id | Verdict |
+|----|---------|
+| `authored_first_error_003` | **Perfect** — missing ½ on triangle area; no numeric dump |
+| `en_en_hint_gsm8k_v7_00002` | **Perfect** — Betty wallet hint + why + check Q; no $ |
+| others | leak / wrong first line / fact error (see log) |
+
+- Log: `adtc/logs/try_prompt/v7_q4_training_sample_prompts.log`
+- JSON: `adtc/logs/try_prompt/v7_q4_training_sample_prompts.json`
+- `tp_001` = triangle first-error; `tp_002` = Betty hint (exact training user texts)
+
+### Next
+1. Re-push submission fork so GitHub matches new `test_prompts`.
+2. Use these two in the demo video.
+
+---
+
+## 2026-09-22 — Gate 2 re-audit; packaging tidy; commit remaining
+
+### Outcome
+Re-checked [`GATE2_PLACEMENT_CHECKLIST.md`](GATE2_PLACEMENT_CHECKLIST.md) vs live GitHub: `9caa7ca` already had TebebAI metadata, pinned `download_model.sh`, `REPORT.md`, `chat.py`, and `provenance/`. Remaining packaging: new on-policy `test_prompts`, licenses, GGUF SHA (drop TBD), `train_loss=0.6026`, mixed sample. Ops still open: video, Devpost submit, diligence call.
+
+### Next
+1. Push submission + parent repos.
+2. Record ≤2 min video; paste DEVPOST.md.
