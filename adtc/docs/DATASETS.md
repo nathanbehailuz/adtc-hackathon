@@ -1,5 +1,7 @@
 # Datasets — v6 English-only STEM tutor
 
+> **Next dataset design:** See [`DATASET_SPEC_V8.md`](./DATASET_SPEC_V8.md) for the proposed balanced STEM tutoring schema, source decisions, construction pipeline, and evaluation-isolation policy.
+
 **Measured eval / profiler:** [`RESULTS_REPORT.md`](./RESULTS_REPORT.md).  
 **Mix report:** [`artifacts/v6/sft_mix_v6_report.md`](./artifacts/v6/sft_mix_v6_report.md).
 

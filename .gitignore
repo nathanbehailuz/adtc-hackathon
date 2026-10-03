@@ -27,3 +27,5 @@ adtc/agh/logs/*
 adtc/agh/.agh-work/
 adtc/.agh-work/
 adtc/.env
+
+.env

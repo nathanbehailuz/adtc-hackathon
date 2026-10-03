@@ -1260,3 +1260,24 @@ Shortened `test_prompts` and re-ran `python3 chat.py --from-metadata` on local v
 ### Next
 1. Commit + push submission `metadata.json` / REPORT if keeping these prompts.
 2. Demo video with the short versions.
+
+---
+
+## 2026-10-03 — v8 dataset specification second review
+
+### Outcome
+Revised `docs/DATASET_SPEC_V8.md` after a second feasibility and consistency review. The spec now blocks bulk model spend on a per-cell source-supply census, aligns Jev routing with TypeSafe's Noul/Choice/Score primitives, resolves deterministic-generator identity and dedup behavior, and removes unverified OpenAI model names in favor of API-preflighted role IDs.
+
+### What
+- Added an explicit Biology/Earth-science supply risk and Step 0 census with no preselected remediation.
+- Defined generator families by template version plus surface/context scenario; random parameter draws no longer manufacture family diversity.
+- Verified the TypeSafe account exposes `jev-latest`/`jev-preview`; pinned the documented `jev-1.13.0` model and current `typesafe-sdk==0.7.2`.
+- Replaced behavior `confidence` with Noul `p_yes`, added Choice distributions for unresolved subject routing, and recommended Score questions for quality dimensions.
+- Expanded cost accounting to student-state generation, plans, translation, calibration, context verification, and re-verification.
+- Added correct-attempt Diagnose semantics, replay sanitization, deterministic-routing exemptions, the 13-prompt frozen judge-replay slice, and content-versus-chat-template handling for `<think>` tokens.
+- The OpenAI key lacks `api.model.read`, so proposed model names could not be verified through `/v1/models`; the spec now requires a callable-ID preflight before the QA pilot.
+
+### Next
+1. Run the no-generation source-supply census before implementing bulk generation.
+2. Choose and preflight callable generator, verifier, and adjudicator model IDs.
+3. Freeze and hash the 13 unique judge-replay prompts before source selection.
