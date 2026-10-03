@@ -1,0 +1,514 @@
+{
+  "report_version": "tebeb-v8-supply-census-v1",
+  "generated_at": "2026-10-03T14:04:41.621045+00:00",
+  "generation_calls": 0,
+  "manifest_version": "tebeb-sources-v8.1",
+  "policy": {
+    "counts_only_approved_pinned_sources": true,
+    "requires_secondary_9_12": true,
+    "grounding_required_for": [
+      "explain",
+      "hint",
+      "diagnose"
+    ],
+    "family_deduplication": "global family_id"
+  },
+  "sources": [
+    {
+      "source_id": "deterministic_stem_v1",
+      "allowed_use": false,
+      "review_status": "pending_pin",
+      "revision_pinned": false,
+      "inventory_path": null,
+      "inventory_status": "not_configured",
+      "inventory_rows": 0,
+      "declared_capabilities": {
+        "subjects": [
+          "math",
+          "physics",
+          "chemistry"
+        ],
+        "behaviors": [
+          "solve",
+          "explain",
+          "hint",
+          "diagnose"
+        ],
+        "grade_bands": [
+          "secondary_9_12"
+        ],
+        "has_grounding": true
+      },
+      "counted_families": 0,
+      "rejected_rows": 0
+    },
+    {
+      "source_id": "stem",
+      "allowed_use": false,
+      "review_status": "pending_pin",
+      "revision_pinned": false,
+      "inventory_path": null,
+      "inventory_status": "not_configured",
+      "inventory_rows": 0,
+      "declared_capabilities": {
+        "subjects": [
+          "math",
+          "physics",
+          "chemistry",
+          "biology",
+          "earth_science"
+        ],
+        "behaviors": [
+          "solve"
+        ],
+        "grade_bands": [
+          "secondary_9_12"
+        ],
+        "has_grounding": false
+      },
+      "counted_families": 0,
+      "rejected_rows": 0
+    },
+    {
+      "source_id": "math_train",
+      "allowed_use": false,
+      "review_status": "pending_pin",
+      "revision_pinned": false,
+      "inventory_path": null,
+      "inventory_status": "not_configured",
+      "inventory_rows": 0,
+      "declared_capabilities": {
+        "subjects": [
+          "math"
+        ],
+        "behaviors": [
+          "solve",
+          "explain",
+          "hint",
+          "diagnose"
+        ],
+        "grade_bands": [
+          "secondary_9_12"
+        ],
+        "has_grounding": true
+      },
+      "counted_families": 0,
+      "rejected_rows": 0
+    },
+    {
+      "source_id": "numinamath_1_5",
+      "allowed_use": false,
+      "review_status": "pending_license",
+      "revision_pinned": false,
+      "inventory_path": null,
+      "inventory_status": "not_configured",
+      "inventory_rows": 0,
+      "declared_capabilities": {
+        "subjects": [
+          "math"
+        ],
+        "behaviors": [
+          "solve",
+          "explain",
+          "hint",
+          "diagnose"
+        ],
+        "grade_bands": [
+          "secondary_9_12"
+        ],
+        "has_grounding": true
+      },
+      "counted_families": 0,
+      "rejected_rows": 0
+    },
+    {
+      "source_id": "mathdial",
+      "allowed_use": false,
+      "review_status": "pending_pin",
+      "revision_pinned": false,
+      "inventory_path": null,
+      "inventory_status": "not_configured",
+      "inventory_rows": 0,
+      "declared_capabilities": {
+        "subjects": [
+          "math"
+        ],
+        "behaviors": [
+          "hint",
+          "diagnose"
+        ],
+        "grade_bands": [
+          "secondary_9_12"
+        ],
+        "has_grounding": true
+      },
+      "counted_families": 0,
+      "rejected_rows": 0
+    },
+    {
+      "source_id": "bridge",
+      "allowed_use": false,
+      "review_status": "pending_pin",
+      "revision_pinned": false,
+      "inventory_path": null,
+      "inventory_status": "not_configured",
+      "inventory_rows": 0,
+      "declared_capabilities": {
+        "subjects": [
+          "math"
+        ],
+        "behaviors": [
+          "hint",
+          "diagnose"
+        ],
+        "grade_bands": [
+          "secondary_9_12"
+        ],
+        "has_grounding": true
+      },
+      "counted_families": 0,
+      "rejected_rows": 0
+    },
+    {
+      "source_id": "exams",
+      "allowed_use": false,
+      "review_status": "pending_pin",
+      "revision_pinned": false,
+      "inventory_path": null,
+      "inventory_status": "not_configured",
+      "inventory_rows": 0,
+      "declared_capabilities": {
+        "subjects": [
+          "math",
+          "physics",
+          "chemistry",
+          "biology",
+          "earth_science"
+        ],
+        "behaviors": [
+          "solve"
+        ],
+        "grade_bands": [
+          "secondary_9_12"
+        ],
+        "has_grounding": false
+      },
+      "counted_families": 0,
+      "rejected_rows": 0
+    }
+  ],
+  "cells": [
+    {
+      "subject": "math",
+      "behavior": "solve",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "math",
+      "behavior": "explain",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "math",
+      "behavior": "hint",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "math",
+      "behavior": "diagnose",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "physics",
+      "behavior": "solve",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "physics",
+      "behavior": "explain",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "physics",
+      "behavior": "hint",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "physics",
+      "behavior": "diagnose",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "chemistry",
+      "behavior": "solve",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "chemistry",
+      "behavior": "explain",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "chemistry",
+      "behavior": "hint",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "chemistry",
+      "behavior": "diagnose",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "pin and approve declared sources",
+        "produce hard-gate metadata inventories",
+        "add valid structured sources or generators before model spend"
+      ]
+    },
+    {
+      "subject": "biology",
+      "behavior": "solve",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "approve a licensed grounding-only biology reference corpus",
+        "add solver-backed generators for genetics and population models",
+        "revise the matrix through a separate go/no-go decision"
+      ]
+    },
+    {
+      "subject": "biology",
+      "behavior": "explain",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "approve a licensed grounding-only biology reference corpus",
+        "add solver-backed generators for genetics and population models",
+        "revise the matrix through a separate go/no-go decision"
+      ]
+    },
+    {
+      "subject": "biology",
+      "behavior": "hint",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "approve a licensed grounding-only biology reference corpus",
+        "add solver-backed generators for genetics and population models",
+        "revise the matrix through a separate go/no-go decision"
+      ]
+    },
+    {
+      "subject": "biology",
+      "behavior": "diagnose",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "approve a licensed grounding-only biology reference corpus",
+        "add solver-backed generators for genetics and population models",
+        "revise the matrix through a separate go/no-go decision"
+      ]
+    },
+    {
+      "subject": "earth_science",
+      "behavior": "solve",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "approve a licensed grounding-only Earth-science reference corpus",
+        "add solver-backed generators for half-life, lapse rate, and plate motion",
+        "revise the matrix through a separate go/no-go decision"
+      ]
+    },
+    {
+      "subject": "earth_science",
+      "behavior": "explain",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "approve a licensed grounding-only Earth-science reference corpus",
+        "add solver-backed generators for half-life, lapse rate, and plate motion",
+        "revise the matrix through a separate go/no-go decision"
+      ]
+    },
+    {
+      "subject": "earth_science",
+      "behavior": "hint",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "approve a licensed grounding-only Earth-science reference corpus",
+        "add solver-backed generators for half-life, lapse rate, and plate motion",
+        "revise the matrix through a separate go/no-go decision"
+      ]
+    },
+    {
+      "subject": "earth_science",
+      "behavior": "diagnose",
+      "post_dedup_family_lower_bound": 0,
+      "preferred_target": 500,
+      "minimum_for_full_build": 400,
+      "gap_to_minimum": 400,
+      "status": "short",
+      "by_source": {},
+      "remediation": [
+        "approve a licensed grounding-only Earth-science reference corpus",
+        "add solver-backed generators for half-life, lapse rate, and plate motion",
+        "revise the matrix through a separate go/no-go decision"
+      ]
+    }
+  ],
+  "summary": {
+    "inventory_rows_seen": 0,
+    "approved_sources": 0,
+    "ready_cells": 0,
+    "short_cells": 20,
+    "all_cells_ready_for_model_spend": false
+  },
+  "gate_a": {
+    "tooling_complete": true,
+    "supply_decision": "blocked_short_cells",
+    "may_start_bulk_model_calls": false
+  }
+}

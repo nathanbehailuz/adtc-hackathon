@@ -1,0 +1,1050 @@
+{
+  "$defs": {
+    "BehaviorEligibility": {
+      "additionalProperties": false,
+      "properties": {
+        "eligible": {
+          "title": "Eligible",
+          "type": "boolean"
+        },
+        "p_yes": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "P Yes"
+        },
+        "method": {
+          "enum": [
+            "jev_noul",
+            "deterministic_source"
+          ],
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "eligible",
+        "method"
+      ],
+      "title": "BehaviorEligibility",
+      "type": "object"
+    },
+    "ConstraintItem": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "check": {
+          "minLength": 1,
+          "title": "Check",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": true,
+          "title": "Parameters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "check"
+      ],
+      "title": "ConstraintItem",
+      "type": "object"
+    },
+    "ConstraintResult": {
+      "additionalProperties": false,
+      "properties": {
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "observed": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed"
+        },
+        "matched_variants": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Matched Variants",
+          "type": "array"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "passed"
+      ],
+      "title": "ConstraintResult",
+      "type": "object"
+    },
+    "Constraints": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/$defs/ConstraintItem"
+          },
+          "minItems": 1,
+          "title": "Items",
+          "type": "array"
+        },
+        "forbidden_answers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Forbidden Answers",
+          "type": "array"
+        },
+        "constraint_results": {
+          "additionalProperties": {
+            "$ref": "#/$defs/ConstraintResult"
+          },
+          "title": "Constraint Results",
+          "type": "object"
+        },
+        "all_constraints_pass": {
+          "title": "All Constraints Pass",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "items",
+        "constraint_results",
+        "all_constraints_pass"
+      ],
+      "title": "Constraints",
+      "type": "object"
+    },
+    "Curriculum": {
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "enum": [
+            "math",
+            "physics",
+            "chemistry",
+            "biology",
+            "earth_science"
+          ],
+          "title": "Subject",
+          "type": "string"
+        },
+        "secondary_subjects": {
+          "items": {
+            "enum": [
+              "math",
+              "physics",
+              "chemistry",
+              "biology",
+              "earth_science"
+            ],
+            "type": "string"
+          },
+          "title": "Secondary Subjects",
+          "type": "array"
+        },
+        "topic": {
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        },
+        "subtopic": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subtopic"
+        },
+        "grade_band": {
+          "const": "secondary_9_12",
+          "title": "Grade Band",
+          "type": "string"
+        },
+        "difficulty": {
+          "enum": [
+            "easy",
+            "medium",
+            "hard"
+          ],
+          "title": "Difficulty",
+          "type": "string"
+        },
+        "learning_objective": {
+          "minLength": 1,
+          "title": "Learning Objective",
+          "type": "string"
+        }
+      },
+      "required": [
+        "subject",
+        "topic",
+        "grade_band",
+        "difficulty",
+        "learning_objective"
+      ],
+      "title": "Curriculum",
+      "type": "object"
+    },
+    "Dedup": {
+      "additionalProperties": false,
+      "properties": {
+        "normalization_version": {
+          "minLength": 1,
+          "title": "Normalization Version",
+          "type": "string"
+        },
+        "canonical_content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Canonical Content Hash",
+          "type": "string"
+        },
+        "prompt_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "assistant_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Assistant Hash",
+          "type": "string"
+        },
+        "constraint_signature": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Constraint Signature",
+          "type": "string"
+        },
+        "template_fingerprint": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Template Fingerprint",
+          "type": "string"
+        },
+        "semantic_cluster_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Semantic Cluster Id"
+        },
+        "nearest_eval_similarity": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nearest Eval Similarity"
+        },
+        "duplicate_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duplicate Of"
+        },
+        "decision": {
+          "enum": [
+            "keep",
+            "reject",
+            "adjudicate"
+          ],
+          "title": "Decision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "normalization_version",
+        "canonical_content_hash",
+        "prompt_hash",
+        "assistant_hash",
+        "constraint_signature",
+        "template_fingerprint",
+        "decision"
+      ],
+      "title": "Dedup",
+      "type": "object"
+    },
+    "Grounding": {
+      "additionalProperties": false,
+      "properties": {
+        "problem": {
+          "minLength": 1,
+          "title": "Problem",
+          "type": "string"
+        },
+        "canonical_answer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Canonical Answer"
+        },
+        "solution_steps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Solution Steps",
+          "type": "array"
+        },
+        "supporting_facts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Supporting Facts",
+          "type": "array"
+        },
+        "reference_explanation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Explanation"
+        },
+        "equations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Equations",
+          "type": "array"
+        },
+        "units": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Units",
+          "type": "array"
+        },
+        "accepted_variants": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Accepted Variants",
+          "type": "array"
+        }
+      },
+      "required": [
+        "problem",
+        "canonical_answer"
+      ],
+      "title": "Grounding",
+      "type": "object"
+    },
+    "Identity": {
+      "additionalProperties": false,
+      "properties": {
+        "source_key": {
+          "minLength": 1,
+          "title": "Source Key",
+          "type": "string"
+        },
+        "family_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Family Id",
+          "type": "string"
+        },
+        "row_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Row Id",
+          "type": "string"
+        },
+        "record_version": {
+          "minimum": 1,
+          "title": "Record Version",
+          "type": "integer"
+        },
+        "parent_row_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Parent Row Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_key",
+        "family_id",
+        "row_id",
+        "record_version"
+      ],
+      "title": "Identity",
+      "type": "object"
+    },
+    "Message": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "system",
+            "user",
+            "assistant"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "content": {
+          "minLength": 1,
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "title": "Message",
+      "type": "object"
+    },
+    "Pedagogy": {
+      "additionalProperties": false,
+      "properties": {
+        "behavior": {
+          "enum": [
+            "solve",
+            "explain",
+            "hint",
+            "diagnose"
+          ],
+          "title": "Behavior",
+          "type": "string"
+        },
+        "teacher_move": {
+          "enum": [
+            "focus",
+            "probe",
+            "tell",
+            "generic"
+          ],
+          "title": "Teacher Move",
+          "type": "string"
+        },
+        "intent": {
+          "enum": [
+            "guide_focus",
+            "seek_strategy",
+            "seek_explanation",
+            "seek_self_correction",
+            "recall_relevant_fact",
+            "perturb_problem",
+            "reveal_strategy",
+            "reveal_step",
+            "reveal_answer",
+            "encourage",
+            "check_understanding",
+            "greet_or_close",
+            "general_inquiry"
+          ],
+          "title": "Intent",
+          "type": "string"
+        },
+        "principles": {
+          "items": {
+            "enum": [
+              "active_learning",
+              "manage_cognitive_load",
+              "adapt_to_learner",
+              "stimulate_curiosity",
+              "deepen_metacognition"
+            ],
+            "type": "string"
+          },
+          "title": "Principles",
+          "type": "array"
+        },
+        "answer_policy": {
+          "enum": [
+            "reveal_final",
+            "partial_reveal",
+            "withhold_final"
+          ],
+          "title": "Answer Policy",
+          "type": "string"
+        },
+        "question_count": {
+          "minimum": 0,
+          "title": "Question Count",
+          "type": "integer"
+        },
+        "interaction_mode": {
+          "enum": [
+            "single_turn",
+            "multi_turn"
+          ],
+          "title": "Interaction Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "behavior",
+        "teacher_move",
+        "intent",
+        "answer_policy",
+        "question_count",
+        "interaction_mode"
+      ],
+      "title": "Pedagogy",
+      "type": "object"
+    },
+    "Quality": {
+      "additionalProperties": false,
+      "properties": {
+        "generator": {
+          "title": "Generator",
+          "type": "string"
+        },
+        "verifiers": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Verifiers",
+          "type": "array"
+        },
+        "factual_score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Factual Score",
+          "type": "number"
+        },
+        "pedagogy_score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Pedagogy Score",
+          "type": "number"
+        },
+        "constraint_pass": {
+          "title": "Constraint Pass",
+          "type": "boolean"
+        },
+        "curator_review": {
+          "enum": [
+            "accepted",
+            "rejected",
+            "pending"
+          ],
+          "title": "Curator Review",
+          "type": "string"
+        },
+        "curator_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Curator Model"
+        },
+        "model_independence": {
+          "enum": [
+            "same-provider-reduced-independence",
+            "cross-provider",
+            "not-applicable"
+          ],
+          "title": "Model Independence",
+          "type": "string"
+        },
+        "review_passes": {
+          "minimum": 0,
+          "title": "Review Passes",
+          "type": "integer"
+        },
+        "assurance_tier": {
+          "enum": [
+            "standard",
+            "high"
+          ],
+          "title": "Assurance Tier",
+          "type": "string"
+        },
+        "selection": {
+          "$ref": "#/$defs/Selection"
+        }
+      },
+      "required": [
+        "generator",
+        "verifiers",
+        "factual_score",
+        "pedagogy_score",
+        "constraint_pass",
+        "curator_review",
+        "model_independence",
+        "review_passes",
+        "assurance_tier",
+        "selection"
+      ],
+      "title": "Quality",
+      "type": "object"
+    },
+    "QualityScores": {
+      "additionalProperties": false,
+      "properties": {
+        "grounding": {
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Grounding",
+          "type": "integer"
+        },
+        "answer_verifiability": {
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Answer Verifiability",
+          "type": "integer"
+        },
+        "curriculum_fit": {
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Curriculum Fit",
+          "type": "integer"
+        },
+        "behavior_affordance": {
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Behavior Affordance",
+          "type": "integer"
+        },
+        "clarity": {
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Clarity",
+          "type": "integer"
+        },
+        "diversity_value": {
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Diversity Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "grounding",
+        "answer_verifiability",
+        "curriculum_fit",
+        "behavior_affordance",
+        "clarity",
+        "diversity_value"
+      ],
+      "title": "QualityScores",
+      "type": "object"
+    },
+    "Selection": {
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "enum": [
+            "accept",
+            "reject",
+            "pending"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "subject_method": {
+          "enum": [
+            "source_metadata",
+            "deterministic_mapping",
+            "ontology_rule",
+            "jev_choice",
+            "adjudicator"
+          ],
+          "title": "Subject Method",
+          "type": "string"
+        },
+        "subject_distribution": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject Distribution"
+        },
+        "subject_choice_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject Choice Confidence"
+        },
+        "behavior_eligibility": {
+          "additionalProperties": {
+            "$ref": "#/$defs/BehaviorEligibility"
+          },
+          "title": "Behavior Eligibility",
+          "type": "object"
+        },
+        "behavior_classifier": {
+          "title": "Behavior Classifier",
+          "type": "string"
+        },
+        "typesafe_sdk": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Typesafe Sdk"
+        },
+        "selected_behavior": {
+          "enum": [
+            "solve",
+            "explain",
+            "hint",
+            "diagnose"
+          ],
+          "title": "Selected Behavior",
+          "type": "string"
+        },
+        "scores": {
+          "$ref": "#/$defs/QualityScores"
+        },
+        "total": {
+          "maximum": 12,
+          "minimum": 0,
+          "title": "Total",
+          "type": "integer"
+        },
+        "rejection_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Rejection Reasons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "decision",
+        "subject_method",
+        "behavior_eligibility",
+        "behavior_classifier",
+        "selected_behavior",
+        "scores",
+        "total"
+      ],
+      "title": "Selection",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "minLength": 1,
+          "title": "Dataset",
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        },
+        "config": {
+          "minLength": 1,
+          "title": "Config",
+          "type": "string"
+        },
+        "source_split": {
+          "minLength": 1,
+          "title": "Source Split",
+          "type": "string"
+        },
+        "original_id": {
+          "minLength": 1,
+          "title": "Original Id",
+          "type": "string"
+        },
+        "url": {
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        },
+        "license": {
+          "minLength": 1,
+          "title": "License",
+          "type": "string"
+        },
+        "license_class": {
+          "enum": [
+            "permissive",
+            "share_alike",
+            "noncommercial",
+            "custom_restricted"
+          ],
+          "title": "License Class",
+          "type": "string"
+        },
+        "export_profile": {
+          "enum": [
+            "permissive",
+            "sharealike",
+            "noncommercial",
+            "internal_only"
+          ],
+          "title": "Export Profile",
+          "type": "string"
+        },
+        "transformation": {
+          "minLength": 1,
+          "title": "Transformation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset",
+        "revision",
+        "config",
+        "source_split",
+        "original_id",
+        "url",
+        "license",
+        "license_class",
+        "export_profile",
+        "transformation"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "StudentState": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt": {
+          "minLength": 1,
+          "title": "Attempt",
+          "type": "string"
+        },
+        "first_error_step": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Error Step"
+        },
+        "error_type": {
+          "enum": [
+            "none",
+            "concept_confusion",
+            "wrong_assumption",
+            "unsupported_claim",
+            "instruction_miss",
+            "premature_conclusion",
+            "arithmetic_error",
+            "algebra_error",
+            "ratio_error",
+            "unit_error",
+            "sign_error",
+            "sign_convention_error",
+            "coordinate_choice_error",
+            "formula_selection_error",
+            "transcription_error",
+            "causal_reversal",
+            "category_error",
+            "scale_error",
+            "conservation_error",
+            "equilibrium_error",
+            "representation_error"
+          ],
+          "title": "Error Type",
+          "type": "string"
+        },
+        "error_class": {
+          "anyOf": [
+            {
+              "enum": [
+                "conceptual",
+                "procedural"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Class"
+        },
+        "error_class_rationale": {
+          "minLength": 1,
+          "title": "Error Class Rationale",
+          "type": "string"
+        },
+        "misconception": {
+          "minLength": 1,
+          "title": "Misconception",
+          "type": "string"
+        }
+      },
+      "required": [
+        "attempt",
+        "error_type",
+        "error_class",
+        "error_class_rationale",
+        "misconception"
+      ],
+      "title": "StudentState",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "tebeb-v8.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "split": {
+      "enum": [
+        "train",
+        "validation",
+        "test",
+        "external_eval"
+      ],
+      "title": "Split",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "curriculum": {
+      "$ref": "#/$defs/Curriculum"
+    },
+    "pedagogy": {
+      "$ref": "#/$defs/Pedagogy"
+    },
+    "grounding": {
+      "$ref": "#/$defs/Grounding"
+    },
+    "student_state": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StudentState"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "constraints": {
+      "$ref": "#/$defs/Constraints"
+    },
+    "messages": {
+      "items": {
+        "$ref": "#/$defs/Message"
+      },
+      "maxItems": 3,
+      "minItems": 2,
+      "title": "Messages",
+      "type": "array"
+    },
+    "quality": {
+      "$ref": "#/$defs/Quality"
+    },
+    "identity": {
+      "$ref": "#/$defs/Identity"
+    },
+    "dedup": {
+      "$ref": "#/$defs/Dedup"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "split",
+    "source",
+    "curriculum",
+    "pedagogy",
+    "grounding",
+    "constraints",
+    "messages",
+    "quality",
+    "identity",
+    "dedup"
+  ],
+  "title": "TebebAI canonical record tebeb-v8.1",
+  "type": "object",
+  "$id": "https://tebeb.ai/schemas/tebeb-v8.1.schema.json"
+}

@@ -1,0 +1,166 @@
+manifest_version: tebeb-sources-v8.1
+generated_at: "2026-10-03"
+policy: >-
+  Fail closed: a source contributes zero census families until its exact revision,
+  split, license, attribution, and inventory are reviewed and allowed_use is true.
+
+sources:
+  - id: deterministic_stem_v1
+    name: Tebeb deterministic STEM generators v1
+    dataset: tebeb/deterministic-stem-v1
+    url: repo:data/generators/stem_v1
+    revision: null
+    config: default
+    imported_split: train
+    license: project-generated
+    license_class: permissive
+    attribution: TebebAI project-generated deterministic templates and solvers.
+    allowed_use: false
+    export_profile: excluded
+    review_status: pending_pin
+    reviewed_at: null
+    inventory_path: null
+    capabilities:
+      subjects: [math, physics, chemistry]
+      behaviors: [solve, explain, hint, diagnose]
+      grade_bands: [secondary_9_12]
+      has_grounding: true
+    notes: Phase C must implement, test, and pin the generator revision.
+
+  - id: stem
+    name: STEM dataset
+    dataset: stemdataset/STEM
+    url: https://huggingface.co/datasets/stemdataset/STEM
+    revision: null
+    config: default
+    imported_split: train
+    license: apache-2.0-declared
+    license_class: permissive
+    attribution: Shen et al., Measuring Vision-Language STEM Skills of Neural Models.
+    allowed_use: false
+    export_profile: excluded
+    review_status: pending_pin
+    reviewed_at: null
+    inventory_path: null
+    capabilities:
+      subjects: [math, physics, chemistry, biology, earth_science]
+      behaviors: [solve]
+      grade_bands: [secondary_9_12]
+      has_grounding: false
+    notes: >-
+      Retain upper-secondary text-only rows only; audit source-level provenance
+      despite the dataset-level Apache declaration.
+
+  - id: math_train
+    name: MATH train
+    dataset: hendrycks/math
+    url: https://github.com/hendrycks/math
+    revision: null
+    config: all
+    imported_split: train
+    license: MIT
+    license_class: permissive
+    attribution: Hendrycks et al., Measuring Mathematical Problem Solving With the MATH Dataset.
+    allowed_use: false
+    export_profile: excluded
+    review_status: pending_pin
+    reviewed_at: null
+    inventory_path: null
+    capabilities:
+      subjects: [math]
+      behaviors: [solve, explain, hint, diagnose]
+      grade_bands: [secondary_9_12]
+      has_grounding: true
+    notes: Freeze MATH test families before importing selected train rows.
+
+  - id: numinamath_1_5
+    name: NuminaMath 1.5 audited slice
+    dataset: AI-MO/NuminaMath-1.5
+    url: https://huggingface.co/datasets/AI-MO/NuminaMath-1.5
+    revision: null
+    config: default
+    imported_split: train
+    license: apache-2.0-declared
+    license_class: permissive
+    attribution: Project Numina; retain upstream source attribution per row.
+    allowed_use: false
+    export_profile: excluded
+    review_status: pending_license
+    reviewed_at: null
+    inventory_path: null
+    capabilities:
+      subjects: [math]
+      behaviors: [solve, explain, hint, diagnose]
+      grade_bands: [secondary_9_12]
+      has_grounding: true
+    notes: Audit upstream source lineage; cap at 15 percent of Mathematics rows.
+
+  - id: mathdial
+    name: MathDial train
+    dataset: eth-nlped/mathdial
+    url: https://github.com/eth-nlped/mathdial
+    revision: null
+    config: default
+    imported_split: train
+    license: CC-BY-SA-4.0
+    license_class: share_alike
+    attribution: Macina et al., MathDial.
+    allowed_use: false
+    export_profile: excluded
+    review_status: pending_pin
+    reviewed_at: null
+    inventory_path: null
+    capabilities:
+      subjects: [math]
+      behaviors: [hint, diagnose]
+      grade_bands: [secondary_9_12]
+      has_grounding: true
+    notes: >-
+      GSM8K-derived pedagogy source; cap lineage at 15 percent of Mathematics and
+      exclude MRBench, BEA, and MathTutorBench families.
+
+  - id: bridge
+    name: Bridge training data
+    dataset: rosewang2008/bridge
+    url: https://github.com/rosewang2008/bridge
+    revision: null
+    config: default
+    imported_split: train
+    license: MIT
+    license_class: permissive
+    attribution: Wang et al., Bridge.
+    allowed_use: false
+    export_profile: excluded
+    review_status: pending_pin
+    reviewed_at: null
+    inventory_path: null
+    capabilities:
+      subjects: [math]
+      behaviors: [hint, diagnose]
+      grade_bands: [secondary_9_12]
+      has_grounding: true
+    notes: Exclude MRBench, BEA, and MathTutorBench families before import.
+
+  - id: exams
+    name: EXAMS train
+    dataset: mhardalov/exams-qa
+    url: https://github.com/mhardalov/exams-qa
+    revision: null
+    config: multilingual
+    imported_split: train
+    license: CC-BY-SA-4.0
+    license_class: share_alike
+    attribution: Hardalov et al., EXAMS.
+    allowed_use: false
+    export_profile: excluded
+    review_status: pending_pin
+    reviewed_at: null
+    inventory_path: null
+    capabilities:
+      subjects: [math, physics, chemistry, biology, earth_science]
+      behaviors: [solve]
+      grade_bands: [secondary_9_12]
+      has_grounding: false
+    notes: >-
+      Import only after pinning translation, back-translation, and answer-preservation
+      checks; keep language variants in one family.

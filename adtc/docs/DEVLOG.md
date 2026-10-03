@@ -1281,3 +1281,21 @@ Revised `docs/DATASET_SPEC_V8.md` after a second feasibility and consistency rev
 1. Run the no-generation source-supply census before implementing bulk generation.
 2. Choose and preflight callable generator, verifier, and adjudicator model IDs.
 3. Freeze and hash the 13 unique judge-replay prompts before source selection.
+
+---
+
+## 2026-10-03 — v8 Phase A foundation and supply gate
+
+### Outcome
+Implemented the offline v8 foundation: canonical Pydantic/JSON Schema validation, versioned normalization and identities, a SQLite uniqueness registry, fail-closed source provenance, and a no-generation supply census. Gate A tooling passes, but progression is correctly blocked: all seven declared sources remain unpinned/unapproved, no metadata inventories have been imported, and all 20 subject × behavior cells are below the 400-family minimum.
+
+### What
+- Added `data/v8/` with schema, controlled vocabularies, source-artifact checks, identity hashing, registry access, source-manifest validation, census logic, CLI, fixtures, and tests.
+- Added `data/manifests/v8/sources.yaml`, `tebeb-v8.1.schema.json`, and initialized `identity_registry.sqlite`.
+- Added `docs/artifacts/v8/supply_census.json`; it records zero generation calls, 0/20 ready cells, and `may_start_bulk_model_calls=false`.
+- Verified eight Phase A tests, including move/intent rules, correct-attempt Diagnose semantics, source-artifact rejection, hash normalization, and SQLite source/logical-variant uniqueness.
+
+### Next
+1. Pin and review source revisions/licenses, then produce metadata inventories for the approved train splits.
+2. Re-run the census and quantify the real Biology/Earth-science shortfall.
+3. Do not start Phase B or bulk Jev/OpenAI work until the supply decision is revisited.
