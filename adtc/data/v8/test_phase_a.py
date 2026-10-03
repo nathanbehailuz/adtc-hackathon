@@ -3,12 +3,20 @@
 from __future__ import annotations
 
 import copy
+import json
 import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
 
 from .census import build_census
+from .eval_firewall import (
+    DEFAULT_EVAL_FILES,
+    FrozenEvalIndex,
+    extract_prompt,
+    freeze_evaluation,
+    validate_gate_b,
+)
 from .fixtures import valid_diagnose_record
 from .identity import IdentityRegistry
 from .normalize import content_hash, normalize_text
@@ -126,6 +134,28 @@ class CensusTests(unittest.TestCase):
         self.assertEqual(20, report["summary"]["short_cells"])
         self.assertFalse(report["gate_a"]["may_start_bulk_model_calls"])
         self.assertEqual("blocked_short_cells", report["gate_a"]["supply_decision"])
+
+
+class EvalFirewallTests(unittest.TestCase):
+    def test_gate_b_and_exact_firewall(self) -> None:
+        judge_path = next(
+            path for path in DEFAULT_EVAL_FILES if path.name == "judge_replay_v8.jsonl"
+        )
+        first = json.loads(judge_path.read_text(encoding="utf-8").splitlines()[0])
+        prompt = extract_prompt(first)
+        self.assertIsNotNone(prompt)
+        with tempfile.TemporaryDirectory() as directory:
+            manifest_path = Path(directory) / "frozen_eval_hashes.json"
+            freeze_evaluation(output_path=manifest_path)
+            result = validate_gate_b(manifest_path=manifest_path)
+            self.assertTrue(result["passed"])
+            index = FrozenEvalIndex(manifest_path)
+            decision = index.check(prompt or "")
+            self.assertFalse(decision.allowed)
+            self.assertTrue(decision.exact_match)
+            self.assertTrue(
+                index.check("A novel unrelated training prompt about cell membranes.").allowed
+            )
 
 
 if __name__ == "__main__":

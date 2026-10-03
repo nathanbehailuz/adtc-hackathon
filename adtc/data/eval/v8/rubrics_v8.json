@@ -1,0 +1,68 @@
+{
+  "rubric_version": "tebeb-eval-rubrics-v8.1",
+  "status": "frozen",
+  "scoring": {
+    "scale": [0, 1, 2],
+    "levels": {
+      "0": "missing, incorrect, or contradicts the requirement",
+      "1": "partially correct or incomplete",
+      "2": "correct, complete, and appropriate for the requested level"
+    },
+    "hard_fail_checks": [
+      "no_source_artifacts",
+      "withhold_final_answer",
+      "locate_first_error",
+      "identify_exact_error"
+    ]
+  },
+  "dimensions": {
+    "correctness": "Scientific, mathematical, numerical, symbolic, and unit validity.",
+    "diagnosis": "Correct identification and location of the first error or misconception.",
+    "guidance": "A useful next step that lets the learner make progress.",
+    "instruction_following": "Completion of every requested part and negative constraint.",
+    "pedagogy": "Age-appropriate explanation, scaffolding, and checks for understanding."
+  },
+  "atomic_checks": {
+    "acceleration_nonzero": {"type": "semantic", "dimension": "correctness"},
+    "age_appropriate": {"type": "semantic", "dimension": "pedagogy"},
+    "apply_newtons_second_law": {"type": "semantic", "dimension": "correctness"},
+    "complete_energy_sequence": {"type": "semantic", "dimension": "correctness"},
+    "complete_square": {"type": "semantic", "dimension": "correctness"},
+    "correct_acceleration": {"type": "semantic", "dimension": "correctness"},
+    "correct_derivation": {"type": "semantic", "dimension": "correctness"},
+    "correct_final_formula": {"type": "semantic", "dimension": "correctness"},
+    "correct_final_solutions": {"type": "semantic", "dimension": "correctness"},
+    "correct_gravity_explanation": {"type": "semantic", "dimension": "correctness"},
+    "correct_limit": {"type": "semantic", "dimension": "correctness"},
+    "correct_misconception": {"type": "semantic", "dimension": "pedagogy"},
+    "correct_quadratic_solution": {"type": "semantic", "dimension": "correctness"},
+    "correct_substitution": {"type": "semantic", "dimension": "correctness"},
+    "distinguish_energy_force_power": {"type": "semantic", "dimension": "correctness"},
+    "everyday_example": {"type": "semantic", "dimension": "pedagogy"},
+    "exactly_one_followup_question": {"type": "deterministic", "dimension": "instruction_following"},
+    "exactly_two_check_questions": {"type": "deterministic", "dimension": "instruction_following"},
+    "explain_coordinate_direction": {"type": "semantic", "dimension": "correctness"},
+    "explain_each_transformation": {"type": "semantic", "dimension": "guidance"},
+    "explain_formula_validity": {"type": "semantic", "dimension": "correctness"},
+    "explain_limit_can_exist": {"type": "semantic", "dimension": "correctness"},
+    "explain_why_substitution": {"type": "semantic", "dimension": "guidance"},
+    "explain_why_valid": {"type": "semantic", "dimension": "guidance"},
+    "explain_why_wrong": {"type": "semantic", "dimension": "diagnosis"},
+    "factor_and_cancel": {"type": "semantic", "dimension": "correctness"},
+    "give_corrective_hint": {"type": "semantic", "dimension": "guidance"},
+    "give_one_hint": {"type": "hybrid", "dimension": "guidance"},
+    "has_followup_question": {"type": "deterministic", "dimension": "instruction_following"},
+    "identify_area_formula_error": {"type": "semantic", "dimension": "diagnosis"},
+    "identify_distribution_error": {"type": "semantic", "dimension": "diagnosis"},
+    "identify_exact_error": {"type": "semantic", "dimension": "diagnosis"},
+    "identify_indeterminate_form": {"type": "semantic", "dimension": "diagnosis"},
+    "identify_parallel_force": {"type": "semantic", "dimension": "correctness"},
+    "identify_perpendicular_force": {"type": "semantic", "dimension": "correctness"},
+    "identify_sign_convention_error": {"type": "semantic", "dimension": "diagnosis"},
+    "locate_first_error": {"type": "semantic", "dimension": "diagnosis"},
+    "no_source_artifacts": {"type": "deterministic", "dimension": "instruction_following"},
+    "velocity_zero": {"type": "semantic", "dimension": "correctness"},
+    "verified_african_context": {"type": "semantic", "dimension": "pedagogy"},
+    "withhold_final_answer": {"type": "hybrid", "dimension": "instruction_following"}
+  }
+}

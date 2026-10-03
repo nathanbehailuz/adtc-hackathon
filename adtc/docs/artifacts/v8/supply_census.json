@@ -1,6 +1,6 @@
 {
   "report_version": "tebeb-v8-supply-census-v1",
-  "generated_at": "2026-10-03T14:04:41.621045+00:00",
+  "generated_at": "2026-10-03T14:13:26.731968+00:00",
   "generation_calls": 0,
   "manifest_version": "tebeb-sources-v8.1",
   "policy": {
@@ -11,7 +11,9 @@
       "hint",
       "diagnose"
     ],
-    "family_deduplication": "global family_id"
+    "family_deduplication": "global family_id",
+    "frozen_eval_manifest": "/Users/nathanbehailu/Desktop/adtc-hackathon/adtc/data/manifests/v8/frozen_eval_hashes.json",
+    "frozen_eval_required": true
   },
   "sources": [
     {

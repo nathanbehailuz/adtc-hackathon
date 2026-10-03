@@ -14,6 +14,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .eval_firewall import DEFAULT_MANIFEST as DEFAULT_EVAL_MANIFEST, FrozenEvalIndex
 from .sources import DEFAULT_SOURCES, SourceEntry, SourcesManifest, load_sources
 from .vocab import BEHAVIORS, CELL_MINIMUM, CELL_TARGET, SUBJECTS
 
@@ -29,6 +30,7 @@ class InventoryRecord(BaseModel):
     source_id: str
     family_id: str = Field(min_length=1)
     original_id: str = Field(min_length=1)
+    canonical_prompt: str = Field(min_length=1)
     source_split: str
     subject: Literal["math", "physics", "chemistry", "biology", "earth_science"]
     eligible_behaviors: list[Literal["solve", "explain", "hint", "diagnose"]]
@@ -86,6 +88,7 @@ def build_census(
     *,
     project_root: Path = ADTC_ROOT,
     extra_inventory_paths: list[Path] | None = None,
+    eval_manifest_path: Path = DEFAULT_EVAL_MANIFEST,
 ) -> dict[str, Any]:
     source_by_id = {source.id: source for source in manifest.sources}
     inventories: list[InventoryRecord] = []
@@ -126,6 +129,9 @@ def build_census(
         lambda: defaultdict(set)
     )
     counted_by_source: dict[str, set[str]] = defaultdict(set)
+    eval_index = (
+        FrozenEvalIndex(eval_manifest_path) if Path(eval_manifest_path).is_file() else None
+    )
 
     for record in inventories:
         source = source_by_id.get(record.source_id)
@@ -145,6 +151,11 @@ def build_census(
             rejection_reasons.append("license_class_mismatch")
         if not record.hard_gate_pass:
             rejection_reasons.append("hard_gate_failed")
+        if eval_index is None:
+            rejection_reasons.append("frozen_eval_manifest_missing")
+        else:
+            decision = eval_index.check(record.canonical_prompt)
+            rejection_reasons.extend(decision.reasons)
 
         if rejection_reasons:
             if report:
@@ -200,6 +211,8 @@ def build_census(
             "requires_secondary_9_12": True,
             "grounding_required_for": ["explain", "hint", "diagnose"],
             "family_deduplication": "global family_id",
+            "frozen_eval_manifest": str(eval_manifest_path),
+            "frozen_eval_required": True,
         },
         "sources": source_reports,
         "cells": cells,

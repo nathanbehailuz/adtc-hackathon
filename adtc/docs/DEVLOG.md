@@ -1299,3 +1299,22 @@ Implemented the offline v8 foundation: canonical Pydantic/JSON Schema validation
 1. Pin and review source revisions/licenses, then produce metadata inventories for the approved train splits.
 2. Re-run the census and quantify the real Biology/Earth-science shortfall.
 3. Do not start Phase B or bulk Jev/OpenAI work until the supply decision is revisited.
+
+---
+
+## 2026-10-03 — v8 Phase B evaluation firewall
+
+### Outcome
+Completed the local Phase B evaluation freeze without model calls. The v8 judge-replay slice now contains 13 unique prompts, the balanced 5 × 4 evaluation scaffold and rubrics are versioned, and the training firewall rejects exact or template matches against frozen local evaluation. Gate B passes; external benchmark downloads remain explicitly reserved and pending.
+
+### What
+- Frozen judge replay: six Round 1 human-judge prompts plus all seven finalist human/automated prompts.
+- Added 41 atomic rubric checks and 20 planned subject × behavior cells at 50 examples per cell.
+- Hashed 9 local evaluation files into `data/manifests/v8/frozen_eval_hashes.json`, yielding 1,732 unique normalized prompt hashes plus template fingerprints.
+- Reserved MRBench, BEA 2025, MathTutorBench, SceMQA, MMLU high-school, STEM validation/test, EXAMS dev/test, and MATH test for later external-family freezing.
+- Updated the supply census so future inventory records are rejected unless their prompt passes the frozen-evaluation firewall.
+
+### Next
+1. Pin and approve source revisions/licenses and implement Phase C metadata importers.
+2. Download/hash reserved external benchmarks before importing related MathDial, Bridge, STEM, EXAMS, or MATH training families.
+3. Keep bulk Jev/OpenAI generation blocked until the supply census has a credible path to the balanced minimum.

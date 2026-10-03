@@ -19,11 +19,16 @@ python3 -m data.v8.cli export-schema
 python3 -m data.v8.cli init-registry
 python3 -m data.v8.cli census
 python3 -m data.v8.cli validate data/canonical/v8/train.jsonl
+python3 -m data.v8.cli freeze-eval
+python3 -m data.v8.cli gate-b
 ```
 
 The census counts only metadata inventory rows from pinned, approved sources.
 An unpinned source contributes zero. `gate_a.may_start_bulk_model_calls=false`
 is a hard stop: do not begin Jev or generative-model bulk calls.
+
+`gate-b` freezes exact and template hashes for every local evaluation prompt.
+Future inventory rows must pass that firewall before the census counts them.
 
 Inventory JSONL records use this metadata-only shape:
 
@@ -32,6 +37,7 @@ Inventory JSONL records use this metadata-only shape:
   "source_id": "stem",
   "family_id": "sha256:...",
   "original_id": "row-123",
+  "canonical_prompt": "A 2 kg object has a net force of 10 N...",
   "source_split": "train",
   "subject": "physics",
   "eligible_behaviors": ["solve"],

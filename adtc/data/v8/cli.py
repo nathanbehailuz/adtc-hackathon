@@ -8,6 +8,12 @@ from pathlib import Path
 from typing import Any
 
 from .census import DEFAULT_OUTPUT, run_census
+from .eval_firewall import (
+    DEFAULT_EVAL_FILES,
+    DEFAULT_MANIFEST as DEFAULT_EVAL_MANIFEST,
+    freeze_evaluation,
+    validate_gate_b,
+)
 from .identity import DEFAULT_REGISTRY, initialize_registry
 from .schema import canonical_json_schema
 from .sources import DEFAULT_SOURCES, load_sources
@@ -58,6 +64,13 @@ def build_parser() -> argparse.ArgumentParser:
     gate_parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     gate_parser.add_argument("--census-output", type=Path, default=DEFAULT_OUTPUT)
     gate_parser.add_argument("--inventory", type=Path, action="append", default=[])
+
+    freeze_parser = subparsers.add_parser("freeze-eval")
+    freeze_parser.add_argument("--output", type=Path, default=DEFAULT_EVAL_MANIFEST)
+    freeze_parser.add_argument("--file", type=Path, action="append", default=[])
+
+    gate_b_parser = subparsers.add_parser("gate-b")
+    gate_b_parser.add_argument("--output", type=Path, default=DEFAULT_EVAL_MANIFEST)
     return parser
 
 
@@ -103,6 +116,20 @@ def main() -> None:
                 **census_result["gate_a"],
             },
         }
+    elif args.command == "freeze-eval":
+        manifest = freeze_evaluation(
+            output_path=args.output,
+            paths=args.file or DEFAULT_EVAL_FILES,
+        )
+        result = {
+            "manifest": str(args.output),
+            "frozen_files": len(manifest["files"]),
+            "prompt_hashes": len(manifest["exact_prompt_hashes"]),
+            "external_reservations": len(manifest["external_reservations"]),
+        }
+    elif args.command == "gate-b":
+        freeze_evaluation(output_path=args.output)
+        result = validate_gate_b(manifest_path=args.output)
     else:  # pragma: no cover
         raise AssertionError(args.command)
 
